@@ -4,8 +4,9 @@ import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hssf.util.HSSFColor;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.Color;
+import org.apache.poi.ss.usermodel.Font;
 
 import java.awt.*;
 import java.io.*;
@@ -17,24 +18,54 @@ public class Main {
         HSSFWorkbook workbook = new HSSFWorkbook();
         HSSFSheet sheet = workbook.createSheet("Report");
 
+        //Main row with column titles
         Row namesRow = sheet.createRow(0);
+        //Style for cells in this main row
         HSSFCellStyle mainStyle = workbook.createCellStyle();
-        mainStyle.setFillForegroundColor(HSSFColor.TEAL.index);
-        mainStyle.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
-        mainStyle.setAlignment(HSSFCellStyle.ALIGN_CENTER);
+        //Font for text in this row
+        Font font = workbook.createFont();
+        font.setColor(HSSFColor.WHITE.index);
+        font.setFontHeightInPoints((short) 15);
+        mainStyle.setFont(font);
+        //Fill
+        mainStyle.setFillForegroundColor(HSSFColor.AQUA.index);
+        mainStyle.setFillPattern(CellStyle.SOLID_FOREGROUND);
+        //Alignment
+        mainStyle.setAlignment(HSSFCellStyle.ALIGN_LEFT);
+        //Borders
+        mainStyle.setBorderBottom(CellStyle.BORDER_THICK);
+        mainStyle.setBorderLeft(CellStyle.BORDER_THICK);
+        mainStyle.setBorderRight(CellStyle.BORDER_THICK);
+        //Fill main row with data from columnNames
         for (int i = 0; i < columnNames.length; i++) {
             Cell cell = namesRow.createCell(i);
             cell.setCellStyle(mainStyle);
             cell.setCellValue(columnNames[i]);
         }
-
-        int rowNum = 0;
+        sheet.autoSizeColumn(0);
+        
+        //Style for cells with data
+        HSSFCellStyle commonStyle = workbook.createCellStyle();
+        commonStyle.setAlignment(CellStyle.ALIGN_LEFT);
+        //Borders size
+        commonStyle.setBorderTop(CellStyle.BORDER_THIN);
+        commonStyle.setBorderBottom(CellStyle.BORDER_THIN);
+        commonStyle.setBorderLeft(CellStyle.BORDER_THIN);
+        commonStyle.setBorderRight(CellStyle.BORDER_THIN);
+        //Borders color
+        commonStyle.setTopBorderColor(HSSFColor.GREY_50_PERCENT.index);
+        commonStyle.setBottomBorderColor(HSSFColor.GREY_50_PERCENT.index);
+        commonStyle.setLeftBorderColor(HSSFColor.GREY_50_PERCENT.index);
+        commonStyle.setRightBorderColor(HSSFColor.GREY_50_PERCENT.index);
+        //Fill columns with data
+        int rowNum = 1;
         for (Integer key : data.keySet()) {
             Row row = sheet.createRow(rowNum);
             Object [] objArr = data.get(key);
             int cellNum = 0;
             for (Object obj : objArr) {
                 Cell cell = row.createCell(cellNum++);
+                cell.setCellStyle(commonStyle);
                 if(obj instanceof Date)
                     cell.setCellValue((Date)obj);
                 else if(obj instanceof Boolean)
@@ -44,15 +75,15 @@ public class Main {
                 else if(obj instanceof Double)
                     cell.setCellValue((Double)obj);
             }
-            sheet.autoSizeColumn(rowNum);
-            rowNum++;
+            sheet.autoSizeColumn(rowNum++);
         }
-
-    }
+        writeWorkBook(workbook);
+}
 
     public static void writeWorkBook(HSSFWorkbook workbook) {
         try {
-            FileOutputStream out = new FileOutputStream(new File("report.xls"));
+            File file = new File("report.xls");
+            FileOutputStream out = new FileOutputStream(file);
             workbook.write(out);
             out.close();
         } catch (FileNotFoundException e) {
@@ -68,7 +99,7 @@ public class Main {
         data.put(2, new Object[] {2d, "Sam", 800000d});
         data.put(3, new Object[] {3d, "Dean", 700000d});
 
-        generateXLS(new String[] { "Emp No.", "Name", "Salary"}, data);
+        generateXLS(new String[] { "EMPLOYEE", "NAME", "SALARY"}, data);
 
     }
 }
