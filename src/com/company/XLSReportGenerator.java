@@ -16,7 +16,7 @@ public class XLSReportGenerator {
 
 
     public static final int MERGE_COMPANY_ROW_HEIGHT = 1250;
-    public static final int MERGE_REPORT_ROW_HEIGHT = 750;
+    public static final int MERGE_REPORT_ROW_HEIGHT = 800;
     public static final int TABLE_LEFT_OFFSET = 1;
     public static final int TABLE_RIGHT_OFFSET = 1;
     public static final double COMPANY_NAME_FONT_SIZE = 24;
@@ -167,7 +167,7 @@ public class XLSReportGenerator {
         CellUtil.setCellStyleProperty(cell, workbook, "fillForegroundColor", HSSFColor.WHITE.index);
         CellUtil.setCellStyleProperty(cell, workbook, "fillPattern", CellStyle.SOLID_FOREGROUND);
         CellUtil.setCellStyleProperty(cell, workbook, "alignment", HSSFCellStyle.ALIGN_LEFT);
-        CellUtil.setCellStyleProperty(cell, workbook, "verticalAlignment", HSSFCellStyle.VERTICAL_CENTER);
+        CellUtil.setCellStyleProperty(cell, workbook, "verticalAlignment", HSSFCellStyle.VERTICAL_BOTTOM);
         cell.getCellStyle().setFont(reportNameCellFont);
         cell.setCellValue(reportName);
 
@@ -295,13 +295,13 @@ public class XLSReportGenerator {
 
     public static void main(String[] args) {
         List<Object[]> data = new ArrayList<Object[]>();
-        data.add(new Object[]{1d, "John", "150d"});
-        data.add(new Object[]{2d, "Sam", "800000d"});
-        data.add(new Object[]{3d, "Dean", "700000d"});
-        data.add(new Object[]{5d, "Max", "22222d"});
+        data.add(new Object[]{1d, "Johnsdgdsgdsgsdg", "150d"});
+        data.add(new Object[]{2d, "Samsdgsdgdsg", "800000d"});
+        data.add(new Object[]{3d, "Deansdgsdgsdg", "700000d"});
+        data.add(new Object[]{5d, "Maxsdgsdgsdgsdgsdgds", "22222ddsgdsgdsgdsgsdgsdgsdg"});
 
         XLSReportGenerator main = new XLSReportGenerator("VERY COOL PROVIDER", "SI Report",
-                new String[]{"Empasfasfasf", "Emp", "Emp"}, data);
+                new String[]{"E", "Emp", "Emp"}, data);
         main.createXlsFile();
 
     }
