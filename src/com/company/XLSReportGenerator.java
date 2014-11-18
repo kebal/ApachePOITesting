@@ -1,13 +1,11 @@
 package com.company;
 
-import org.apache.poi.hssf.usermodel.HSSFCellStyle;
-import org.apache.poi.hssf.usermodel.HSSFFont;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.ss.util.RegionUtil;
 import org.apache.poi.ss.util.SheetUtil;
 
 import java.io.*;
@@ -47,7 +45,9 @@ public class XLSReportGenerator {
     private void generateStyle() {
         int totalColumnCount = columnNames.length + TABLE_LEFT_OFFSET + TABLE_RIGHT_OFFSET;
         for (int i = 0; i < MERGE_COMPANY_REGION_HEIGHT + MERGE_REPORT_REGION_HEIGHT + 2; i++) {
-            sheet.createRow(i);
+            Row row = sheet.createRow(i);
+            for (int j = 0; j < DATA_Y_OFFSET + data.size() + 1; j++)
+                row.createCell(j);
         }
         int mergeWidth = columnNames.length;
         sheet.addMergedRegion(new CellRangeAddress(
@@ -62,24 +62,33 @@ public class XLSReportGenerator {
                 0,                                                      //first column (0-based)
                 totalColumnCount - 1                                    //last column  (0-based)
         ));
-        sheet.addMergedRegion(new CellRangeAddress(
-                        MERGE_COMPANY_REGION_HEIGHT + 1,                          //first row (0-based)
-                        MERGE_COMPANY_REGION_HEIGHT + MERGE_REPORT_REGION_HEIGHT, //last row  (0-based)
-                        0,                                                        //first column (0-based)
-                        totalColumnCount - 1                                      //last column  (0-based)
-                )
+        CellRangeAddress reportNameRegion = new CellRangeAddress(
+                MERGE_COMPANY_REGION_HEIGHT + 1,                          //first row (0-based)
+                MERGE_COMPANY_REGION_HEIGHT + MERGE_REPORT_REGION_HEIGHT, //last row  (0-based)
+                1,                                                        //first column (0-based)
+                totalColumnCount - 2                                      //last column  (0-based)
         );
-        sheet.addMergedRegion(new CellRangeAddress(
-                        DATA_Y_OFFSET,
-                        DATA_Y_OFFSET + data.size() + 1,
-                        0,
-                        0)
+
+        CellRangeAddress leftSeparator = new CellRangeAddress(
+                DATA_Y_OFFSET - MERGE_REPORT_REGION_HEIGHT,
+                DATA_Y_OFFSET + data.size() + 1,
+                0,
+                0
         );
-        /*
-        CellStyle cl = workbook.createCellStyle();
-        cl.setTopBorderColor(HSSFColor.BLACK.index);
-        sheet.getRow(DATA_Y_OFFSET).createCell(0);
-        sheet.getRow(DATA_Y_OFFSET).getCell(0).setCellStyle(cl);*/
+
+        CellRangeAddress rightSeparator = new CellRangeAddress(
+                DATA_Y_OFFSET - MERGE_REPORT_REGION_HEIGHT,
+                DATA_Y_OFFSET + data.size() + 1,
+                totalColumnCount - 1,
+                totalColumnCount - 1
+        );
+
+        setLeftRightBorders(reportNameRegion, CellStyle.BORDER_THIN, HSSFColor.WHITE.index);
+        setPureBackGround(leftSeparator, HSSFColor.WHITE.index);
+        setPureBackGround(rightSeparator, HSSFColor.WHITE.index);
+        sheet.addMergedRegion(reportNameRegion);
+        sheet.addMergedRegion(leftSeparator);
+        sheet.addMergedRegion(rightSeparator);
 
         //Font for company name
         Font companyNameCellFont = workbook.createFont();
@@ -111,13 +120,16 @@ public class XLSReportGenerator {
         HSSFCellStyle reportNameCellStyle = workbook.createCellStyle();
         reportNameCellStyle.setAlignment(HSSFCellStyle.ALIGN_LEFT);
         reportNameCellStyle.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
+        reportNameCellStyle.setFillForegroundColor(HSSFColor.WHITE.index);
+        reportNameCellStyle.setFillPattern(CellStyle.SOLID_FOREGROUND);
         reportNameCellStyle.setFont(reportNameCellFont);
 
         //Fill the first merged region with report name
-        cell = sheet.getRow(MERGE_COMPANY_REGION_HEIGHT + 1).createCell(0);
+        Row row = sheet.getRow(MERGE_COMPANY_REGION_HEIGHT + 1);
+        row.createCell(0);
+        cell = sheet.getRow(MERGE_COMPANY_REGION_HEIGHT + 1).createCell(1);
         cell.setCellStyle(reportNameCellStyle);
-        String name = "\t" +reportName;
-        cell.setCellValue(name);
+        cell.setCellValue(reportName);
 
 
         double totalWidth = ((COMPANY_NAME_FONT_SIZE / 1.6)/ (totalColumnCount)) * companyName.length() * 256;
@@ -139,7 +151,7 @@ public class XLSReportGenerator {
         }
 
         //Fill data, just for testing
-        Row row = sheet.getRow(DATA_Y_OFFSET);
+        row = sheet.getRow(DATA_Y_OFFSET);
         row.createCell(0);
         row.createCell(1).setCellValue(columnNames[0]);
         row.createCell(2).setCellValue(columnNames[1]);
@@ -151,13 +163,32 @@ public class XLSReportGenerator {
         //Check if autoSizeColumn functions reduced the width of row (thus company name doesn't fit the cell)
         //and expand the very right and the very left cells
         int sum = 0;
-        for (int i = 0; i <= 4; i++)
-        sum += SheetUtil.getColumnWidth(sheet, i, false);
+        for (int i = 0; i < totalColumnCount; i++)
+            sum += sheet.getColumnWidth(i);
         if (sum < totalWidth) {
             double difference = totalWidth - sum;
             sheet.setColumnWidth(0, (int) (width + difference / 2));
             sheet.setColumnWidth(totalColumnCount - 1, (int) (width + difference / 2));
+        } else {
+            double difference = sum - totalWidth;
+            sheet.setColumnWidth(0, Math.max(2000, (int) (width - difference)));
+            sheet.setColumnWidth(totalColumnCount - 1, Math.max(2000, (int) (width - difference)));
         }
+    }
+
+    private void setLeftRightBorders(CellRangeAddress region, short border, short color) {
+        RegionUtil.setBorderLeft(border, region, sheet, workbook);
+        RegionUtil.setBorderRight(border, region, sheet, workbook);
+        RegionUtil.setLeftBorderColor(color, region, sheet, workbook);
+        RegionUtil.setRightBorderColor(color, region, sheet, workbook);
+    }
+
+    private void setPureBackGround(CellRangeAddress region, short color) {
+        HSSFCellStyle cellStyle = workbook.createCellStyle();
+        cellStyle.setFillForegroundColor(color);
+        cellStyle.setFillPattern(CellStyle.SOLID_FOREGROUND);
+        Cell cell = sheet.getRow(region.getFirstRow()).getCell(region.getFirstColumn());
+        cell.setCellStyle(cellStyle);
     }
 /*
 Lexa:
