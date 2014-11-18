@@ -1,6 +1,5 @@
 package com.company;
 
-import org.apache.poi.hssf.record.cf.CellRangeUtil;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFFont;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -16,14 +15,14 @@ import java.util.*;
 
 
 
-public class Main {
+public class XLSReportGenerator {
     public static final int MERGE_COMPANY_REGION_HEIGHT = 5;
     public static final int MERGE_REPORT_REGION_HEIGHT = 4;
     public static final int TABLE_LEFT_OFFSET = 1;
     public static final int TABLE_RIGHT_OFFSET = 1;
     public static final double COMPANY_NAME_FONT_SIZE = 20;
     public static final double REPORT_NAME_FONT_SIZE = 20;
-
+    private static final int INTIAL_CELL_WIDTH = 3000;
     //SPECIALLY FOR MAX
     public static final int DATA_X_OFFSET = 1;
     public static final int DATA_Y_OFFSET = MERGE_COMPANY_REGION_HEIGHT + MERGE_REPORT_REGION_HEIGHT + 1;
@@ -36,7 +35,7 @@ public class Main {
     private HSSFWorkbook workbook;
     private HSSFSheet sheet;
 
-    public Main(String companyName, String reportName, String[] columnNames, List<Object[]> data) {
+    public XLSReportGenerator(String companyName, String reportName, String[] columnNames, List<Object[]> data) {
         this.companyName = companyName;
         this.reportName = reportName;
         this.columnNames = columnNames;
@@ -107,6 +106,7 @@ public class Main {
         reportNameCellFont.setFontHeightInPoints((short) REPORT_NAME_FONT_SIZE);
         reportNameCellFont.setFontName("Times New Roman");
         reportNameCellFont.setUnderline(HSSFFont.U_SINGLE);
+
         //Cell style for report name
         HSSFCellStyle reportNameCellStyle = workbook.createCellStyle();
         reportNameCellStyle.setAlignment(HSSFCellStyle.ALIGN_LEFT);
@@ -116,7 +116,8 @@ public class Main {
         //Fill the first merged region with report name
         cell = sheet.getRow(MERGE_COMPANY_REGION_HEIGHT + 1).createCell(0);
         cell.setCellStyle(reportNameCellStyle);
-        cell.setCellValue(reportName);
+        String name = "\t" +reportName;
+        cell.setCellValue(name);
 
 
         double totalWidth = ((COMPANY_NAME_FONT_SIZE / 1.6)/ (totalColumnCount)) * companyName.length() * 256;
@@ -143,9 +144,9 @@ public class Main {
         row.createCell(1).setCellValue(columnNames[0]);
         row.createCell(2).setCellValue(columnNames[1]);
         row.createCell(3).setCellValue(columnNames[2]);
-        sheet.autoSizeColumn(1);
-        sheet.autoSizeColumn(2);
-        sheet.autoSizeColumn(3);
+        sheet.setColumnWidth(1, INTIAL_CELL_WIDTH);
+        sheet.setColumnWidth(2, INTIAL_CELL_WIDTH);
+        sheet.setColumnWidth(3,INTIAL_CELL_WIDTH);
 
         //Check if autoSizeColumn functions reduced the width of row (thus company name doesn't fit the cell)
         //and expand the very right and the very left cells
@@ -203,7 +204,7 @@ Max:
         data.add(new Object[]{3d, "Dean", 700000d});
         data.add(new Object[]{5d, "Max", 22222d});
 
-        Main main = new Main("VERY COOL PROVIDER", "CI Report",
+        XLSReportGenerator main = new XLSReportGenerator("VERY COOL PROVIDER", "CI Report",
                              new String[] { "Emp", "Emp", "Emp"}, data);
         main.createXlsFile();
 

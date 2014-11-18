@@ -2,3 +2,7 @@
 .idea/
 # ignore target folder
 target/
+*.class
+.idea/workspace.xml
+.idea/workspace.xml
+*.xls
