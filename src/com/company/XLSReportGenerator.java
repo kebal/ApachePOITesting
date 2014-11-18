@@ -12,7 +12,6 @@ import java.io.*;
 import java.util.*;
 
 
-
 public class XLSReportGenerator {
     public static final int MERGE_COMPANY_REGION_HEIGHT = 5;
     public static final int MERGE_REPORT_REGION_HEIGHT = 4;
@@ -142,7 +141,7 @@ public class XLSReportGenerator {
         cell.setCellValue(reportName);
 
 
-        double totalWidth = ((COMPANY_NAME_FONT_SIZE / 1.6)/ (totalColumnCount)) * companyName.length() * 256;
+        double totalWidth = ((COMPANY_NAME_FONT_SIZE / 1.6) / (totalColumnCount)) * companyName.length() * 256;
         double width = totalWidth / (totalColumnCount);
         for (int i = 0; i < totalColumnCount; i++) {
             sheet.setColumnWidth(i, (int) width);
@@ -187,7 +186,7 @@ public class XLSReportGenerator {
             sheet.setColumnWidth(totalColumnCount - 1, Math.max(2000, (int) (width - difference)));
         }
 
-        //fillData();
+        fillData();
     }
 
     private void setLeftRightBorders(CellRangeAddress region, short border, short color) {
@@ -229,50 +228,40 @@ Max:
 // writeWorkBook() - save xls
 */
 
-    private void fillData(){
+    private void fillData() {
+
         Row titleRow = sheet.getRow(DATA_Y_OFFSET);
-        for(int i = DATA_X_OFFSET; i < columnNames.length + DATA_X_OFFSET;i++) {
-            titleRow.createCell(i).setCellValue(columnNames[i - DATA_X_OFFSET]);
+        for (int i = DATA_X_OFFSET; i < columnNames.length + DATA_X_OFFSET; i++) {
+            titleRow.getCell(i).setCellValue(columnNames[i - DATA_X_OFFSET]);
             sheet.setColumnWidth(i, INTIAL_CELL_WIDTH + FILTER_WIDTH_OFFSET);
-            sheet.setAutoFilter(new CellRangeAddress(titleRow.getRowNum(), titleRow.getRowNum(), 0, i));
         }
+        sheet.setAutoFilter(new CellRangeAddress(titleRow.getRowNum(),titleRow.getRowNum(),DATA_X_OFFSET,columnNames.length));
 
-        int rowCount =  DATA_Y_OFFSET+1;
-        double first;
-        String second;
-        double third;
-        Object[] dataInfo;
-        int k =0;
-            for(int i = rowCount; i < rowCount + data.size();i++) {
-                for (int j = DATA_X_OFFSET; j < DATA_X_OFFSET + columnNames.length; j++) {
-                     Row dataRow = sheet.getRow(i);
+        int rowCount = DATA_Y_OFFSET + 1;
+        int columsCount = DATA_X_OFFSET;
 
-                    dataInfo = data.get(k);
-                    first = (Double) dataInfo[0];
-                    second = (String) dataInfo[1];
-                    third = (Double) dataInfo[2];
+        for (int j = 0; j <  columnNames.length; j++) {
+            for (int i = 0; i < data.size(); i++) {
+                Row dataRow = sheet.getRow(rowCount + i);
+                Object[] dataInfo = data.get(i);
+                Object object = dataInfo[j];
 
-                    switch (j- DATA_X_OFFSET ){
-                        case 0:
-                            dataRow.getCell(j).setCellValue(first);
-                            break;
-                        case 1:
-                            dataRow.getCell(j).setCellValue(second);
-                            break;
+                if (object instanceof Double) {
+                    dataRow.getCell(columsCount +j).setCellValue((Double) object);
 
-                        case 2:
-                            dataRow.getCell(j).setCellValue(third);
-                            break;
+                } else if (object instanceof String) {
+                    dataRow.getCell(columsCount +j).setCellValue((String) object);
 
-                    }
-
+                } else if (object instanceof Date) {
+                    dataRow.getCell(columsCount +j).setCellValue((Date) object);
 
                 }
-                k++;
             }
-        sheet.setAutoFilter(new CellRangeAddress(titleRow.getRowNum(),titleRow.getRowNum(),DATA_X_OFFSET,columnNames.length ));
+
 
         }
+
+    }
 
 
 
@@ -298,7 +287,7 @@ Max:
         data.add(new Object[]{5d, "Max", 22222d});
 
         XLSReportGenerator main = new XLSReportGenerator("VERY COOL PROVIDER", "SI Report",
-                             new String[] { "Emp", "Emp", "Emp"}, data);
+                new String[]{"Emp", "Emp", "Emp"}, data);
         main.createXlsFile();
 
     }
