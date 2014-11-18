@@ -238,7 +238,7 @@ Max:
         sheet.setAutoFilter(new CellRangeAddress(titleRow.getRowNum(),titleRow.getRowNum(),DATA_X_OFFSET,columnNames.length));
 
         int rowCount = DATA_Y_OFFSET + 1;
-        int columsCount = DATA_X_OFFSET;
+        int columnsCount = DATA_X_OFFSET;
 
         for (int i = 0; i < data.size(); i++) {
             Object[] dataInfo = data.get(i);
@@ -246,11 +246,11 @@ Max:
             int j = 0;
             for (Object object : dataInfo) {
                 if (object instanceof Double) {
-                    dataRow.getCell(columsCount +j).setCellValue((Double) object);
+                    dataRow.getCell(columnsCount +j).setCellValue((Double) object);
                 } else if (object instanceof String) {
-                    dataRow.getCell(columsCount +j).setCellValue((String) object);
+                    dataRow.getCell(columnsCount +j).setCellValue((String) object);
                 } else if (object instanceof Date) {
-                    dataRow.getCell(columsCount +j).setCellValue((Date) object);
+                    dataRow.getCell(columnsCount +j).setCellValue((Date) object);
                 }
                 j++;
             }
