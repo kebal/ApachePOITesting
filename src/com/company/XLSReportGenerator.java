@@ -111,9 +111,6 @@ public class XLSReportGenerator {
         setPureBackGround(leftSeparator, HSSFColor.WHITE.index);
         setPureBackGround(bottomSeparator, HSSFColor.WHITE.index);
 
-        RegionUtil.setBorderRight(CellStyle.BORDER_THIN, rightSeparator, sheet, workbook);
-        RegionUtil.setRightBorderColor(HSSFColor.AQUA.index, rightSeparator, sheet, workbook);
-
         RegionUtil.setBorderBottom(CellStyle.BORDER_THIN, bottomSeparator, sheet, workbook);
         RegionUtil.setBottomBorderColor(HSSFColor.AQUA.index, bottomSeparator, sheet, workbook);
 
