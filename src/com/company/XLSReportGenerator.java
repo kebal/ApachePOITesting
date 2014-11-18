@@ -106,16 +106,23 @@ public class XLSReportGenerator {
                 totalColumnCount - TABLE_RIGHT_OFFSET - 1
         );
 
-        RegionUtil.setBorderBottom(CellStyle.BORDER_THIN, rightSeparator, sheet, workbook);
-        RegionUtil.setBottomBorderColor(HSSFColor.AQUA.index, rightSeparator, sheet, workbook);
-
-        RegionUtil.setBorderBottom(CellStyle.BORDER_THIN, bottomSeparator, sheet, workbook);
-        RegionUtil.setBottomBorderColor(HSSFColor.AQUA.index, bottomSeparator, sheet, workbook);
-
         setLeftRightBorders(reportNameRegion, CellStyle.BORDER_THIN, HSSFColor.WHITE.index);
         setPureBackGround(rightSeparator, HSSFColor.WHITE.index);
         setPureBackGround(leftSeparator, HSSFColor.WHITE.index);
         setPureBackGround(bottomSeparator, HSSFColor.WHITE.index);
+
+        RegionUtil.setBorderRight(CellStyle.BORDER_THIN, rightSeparator, sheet, workbook);
+        RegionUtil.setRightBorderColor(HSSFColor.AQUA.index, rightSeparator, sheet, workbook);
+
+        RegionUtil.setBorderBottom(CellStyle.BORDER_THIN, bottomSeparator, sheet, workbook);
+        RegionUtil.setBottomBorderColor(HSSFColor.AQUA.index, bottomSeparator, sheet, workbook);
+
+        RegionUtil.setBorderBottom(CellStyle.BORDER_THIN, leftSeparator, sheet, workbook);
+        RegionUtil.setBottomBorderColor(HSSFColor.AQUA.index, leftSeparator, sheet, workbook);
+
+        RegionUtil.setBorderBottom(CellStyle.BORDER_THIN, rightSeparator, sheet, workbook);
+        RegionUtil.setBottomBorderColor(HSSFColor.AQUA.index, rightSeparator, sheet, workbook);
+
         sheet.addMergedRegion(reportNameRegion);
         sheet.addMergedRegion(leftSeparator);
         sheet.addMergedRegion(rightSeparator);
