@@ -240,27 +240,21 @@ Max:
         int rowCount = DATA_Y_OFFSET + 1;
         int columsCount = DATA_X_OFFSET;
 
-        for (int j = 0; j <  columnNames.length; j++) {
-            for (int i = 0; i < data.size(); i++) {
-                Row dataRow = sheet.getRow(rowCount + i);
-                Object[] dataInfo = data.get(i);
-                Object object = dataInfo[j];
-
+        for (int i = 0; i < data.size(); i++) {
+            Object[] dataInfo = data.get(i);
+            Row dataRow = sheet.getRow(rowCount + i);
+            int j = 0;
+            for (Object object : dataInfo) {
                 if (object instanceof Double) {
                     dataRow.getCell(columsCount +j).setCellValue((Double) object);
-
                 } else if (object instanceof String) {
                     dataRow.getCell(columsCount +j).setCellValue((String) object);
-
                 } else if (object instanceof Date) {
                     dataRow.getCell(columsCount +j).setCellValue((Date) object);
-
                 }
+                j++;
             }
-
-
         }
-
     }
 
 
