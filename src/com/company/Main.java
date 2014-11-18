@@ -14,10 +14,45 @@ import java.util.*;
 
 
 public class Main {
+    public static final int MERGE_REGION_HEIGHT = 5;
 
-    private int startX;
-    private int startY;
+    private String companyName;
+    private String reportName;
+    private String[] columnNames;
+    private List<Object[]> data;
 
+    private HSSFWorkbook workbook;
+    private HSSFSheet sheet;
+
+    public Main(String companyName, String reportName, String[] columnNames, List<Object[]> data) {
+        this.companyName = companyName;
+        this.reportName = reportName;
+        this.columnNames = columnNames;
+        this.data = data;
+        workbook = new HSSFWorkbook();
+        sheet = workbook.createSheet("Report");
+    }
+
+    private void generateStyle() {
+        int mergeWidth = columnNames.length;
+        sheet.addMergedRegion(new CellRangeAddress(
+                0,                       //first row (0-based)
+                MERGE_REGION_HEIGHT - 1, //last row  (0-based)
+                0,                       //first column (0-based)
+                mergeWidth               //last column  (0-based)
+        ));
+        sheet.addMergedRegion(new CellRangeAddress(
+                MERGE_REGION_HEIGHT,          //first row (0-based)
+                MERGE_REGION_HEIGHT * 2 - 1,          //last row  (0-based)
+                0,          //first column (0-based)
+                mergeWidth  //last column  (0-based)
+        ));
+
+        HSSFCellStyle companyNameCellStyle = workbook.createCellStyle();
+        companyNameCellStyle.setFillForegroundColor(HSSFColor.AQUA.index);
+        companyNameCellStyle.setFillPattern(CellStyle.SOLID_FOREGROUND);
+        Row row = sheet.createRow(0);
+    }
 /*
 Lexa:
 generateWorkbook();
@@ -34,8 +69,8 @@ Max:
 *
 * */
 
-
-    public static void generateXLS(String[] columnNames, Map<Integer, Object[]> data) {
+/*
+    public void generateXLS(String[] columnNames, List<Object[]> data) {
 
     // generateWorkbook(); - cool company title
     // generateStyle(); - generate style for every cell DO NOT FORGET BORDERS
@@ -43,16 +78,6 @@ Max:
     // fillColumns(); - set data for every cell
     // writeWorkBook() - save xls
 
-        final int COLUMN = 0;
-        HSSFWorkbook workbook = new HSSFWorkbook();
-        HSSFSheet sheet = workbook.createSheet("Report");
-     //   sheet.setAutoFilter(CellRangeAddress.valueOf("A1:C5"));
-        sheet.addMergedRegion(new CellRangeAddress(
-                0,    //first row (0-based)
-                4, //last row  (0-based)
-                0, //first column (0-based)
-                2  //last column  (0-based)
-        ));
 
         //Main row with column titles
         Row namesRow = sheet.createRow(0);
@@ -117,10 +142,12 @@ Max:
 //        }
         writeWorkBook(workbook);
 }
+*/
 
-    public static void writeWorkBook(HSSFWorkbook workbook) {
+    public void createXlsFile() {
+        generateStyle();
         try {
-            File file = new File("report1.xls");
+            File file = new File("report.xls");
             FileOutputStream out = new FileOutputStream(file);
             workbook.write(out);
             out.close();
@@ -132,13 +159,15 @@ Max:
     }
 
     public static void main(String[] args) {
-        Map<Integer, Object[]> data = new HashMap<Integer, Object[]>();
-        data.put(1, new Object[] {1d, "John", 15000000000d});
-        data.put(2, new Object[] {2d, "Sam", 800000d});
-        data.put(3, new Object[] {3d, "Dean", 700000d});
-        data.put(4, new Object[] {5d, "Max", 22222d});
+        List<Object[]> data = new ArrayList<Object[]>();
+        data.add(new Object[]{1d, "John", 15000000000d});
+        data.add(new Object[]{2d, "Sam", 800000d});
+        data.add(new Object[]{3d, "Dean", 700000d});
+        data.add(new Object[]{5d, "Max", 22222d});
 
-        generateXLS(new String[] { "EMPLOYEE", "NAME", "SALARY"}, data);
+        Main main = new Main("VERY COOL PROVIDER COMPANY", "CI Report",
+                             new String[] { "Employee number", "Employee name", "Salary"}, data);
+        main.createXlsFile();
 
     }
 }
