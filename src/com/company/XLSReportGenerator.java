@@ -46,9 +46,9 @@ public class XLSReportGenerator {
 
     private void generateStyle() {
         int totalColumnCount = columnNames.length + TABLE_LEFT_OFFSET + TABLE_RIGHT_OFFSET;
-        for (int i = 0; i < MERGE_COMPANY_REGION_HEIGHT + MERGE_REPORT_REGION_HEIGHT + data.size() + 2; i++) {
+        for (int i = 0; i < DATA_Y_OFFSET + data.size() + 2; i++) {
             Row row = sheet.createRow(i);
-            for (int j = 0; j < DATA_Y_OFFSET + data.size() + 1; j++)
+            for (int j = 0; j < totalColumnCount; j++)
                 row.createCell(j);
         }
         int mergeWidth = columnNames.length;
@@ -85,12 +85,21 @@ public class XLSReportGenerator {
                 totalColumnCount - 1
         );
 
+        CellRangeAddress bottomSeparator = new CellRangeAddress(
+                DATA_Y_OFFSET + data.size() + 1,
+                DATA_Y_OFFSET + data.size() + 1,
+                TABLE_LEFT_OFFSET,
+                totalColumnCount - TABLE_RIGHT_OFFSET - 1
+        );
+
         setLeftRightBorders(reportNameRegion, CellStyle.BORDER_THIN, HSSFColor.WHITE.index);
-        setPureBackGround(leftSeparator, HSSFColor.WHITE.index);
         setPureBackGround(rightSeparator, HSSFColor.WHITE.index);
+        setPureBackGround(leftSeparator, HSSFColor.WHITE.index);
+        setPureBackGround(bottomSeparator, HSSFColor.WHITE.index);
         sheet.addMergedRegion(reportNameRegion);
         sheet.addMergedRegion(leftSeparator);
         sheet.addMergedRegion(rightSeparator);
+        sheet.addMergedRegion(bottomSeparator);
 
         //Font for company name
         Font companyNameCellFont = workbook.createFont();
@@ -107,7 +116,7 @@ public class XLSReportGenerator {
         companyNameCellStyle.setFont(companyNameCellFont);
 
         //Fill the first merged region with company name
-        Cell cell = sheet.getRow(0).createCell(0);
+        Cell cell = sheet.getRow(0).getCell(0);
         cell.setCellStyle(companyNameCellStyle);
         cell.setCellValue(companyName);
 
@@ -128,8 +137,7 @@ public class XLSReportGenerator {
 
         //Fill the first merged region with report name
         Row row = sheet.getRow(MERGE_COMPANY_REGION_HEIGHT + 1);
-        row.createCell(0);
-        cell = sheet.getRow(MERGE_COMPANY_REGION_HEIGHT + 1).createCell(1);
+        cell = row.getCell(TABLE_LEFT_OFFSET);
         cell.setCellStyle(reportNameCellStyle);
         cell.setCellValue(reportName);
 
@@ -149,7 +157,7 @@ public class XLSReportGenerator {
             Row tempRow = sheet.getRow(MERGE_COMPANY_REGION_HEIGHT);
             tempRow.setHeight((short) 150);
             for (int j = 0; j < totalColumnCount; j++)
-                tempRow.createCell(j).setCellStyle(tempCellStyle);
+                tempRow.getCell(j).setCellStyle(tempCellStyle);
         }
 
         //Fill data, just for testing
@@ -179,7 +187,7 @@ public class XLSReportGenerator {
             sheet.setColumnWidth(totalColumnCount - 1, Math.max(2000, (int) (width - difference)));
         }
 
-        fillData();
+        //fillData();
     }
 
     private void setLeftRightBorders(CellRangeAddress region, short border, short color) {
@@ -194,6 +202,7 @@ public class XLSReportGenerator {
         cellStyle.setFillForegroundColor(color);
         cellStyle.setFillPattern(CellStyle.SOLID_FOREGROUND);
         Cell cell = sheet.getRow(region.getFirstRow()).getCell(region.getFirstColumn());
+        System.out.println(cell.getColumnIndex() + " " + cell.getRowIndex());
         cell.setCellStyle(cellStyle);
     }
 /*
