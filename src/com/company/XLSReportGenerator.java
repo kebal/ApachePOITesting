@@ -6,13 +6,14 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.RegionUtil;
-import org.apache.poi.ss.util.SheetUtil;
 
 import java.io.*;
 import java.util.*;
 
 
 public class XLSReportGenerator {
+
+
     public static final int MERGE_COMPANY_ROW_HEIGHT = 1250;
     public static final int MERGE_REPORT_ROW_HEIGHT = 750;
     public static final int TABLE_LEFT_OFFSET = 1;
@@ -24,7 +25,10 @@ public class XLSReportGenerator {
     private static final int FILTER_WIDTH_OFFSET = 1250;
 
     //SPECIALLY FOR MAX
+
+    /** Value - {@value}, column position to start filling data with .*/
     public static final int DATA_X_OFFSET = 1;
+    /** Value - {@value}, row position to start filling data with .*/
     public static final int DATA_Y_OFFSET = 3;
 
     private String companyName;
@@ -35,6 +39,14 @@ public class XLSReportGenerator {
     private HSSFWorkbook workbook;
     private HSSFSheet sheet;
 
+    /**
+     * Constructor.
+     *
+     * @param companyName name of the company created report
+     * @param reportName  name of the report
+     * @param columnNames array of columns names
+     * @param data        list of objects array to fill columns
+     */
     public XLSReportGenerator(String companyName, String reportName, String[] columnNames, List<Object[]> data) {
         this.companyName = companyName;
         this.reportName = reportName;
