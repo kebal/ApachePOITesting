@@ -44,7 +44,7 @@ public class XLSReportGenerator {
 
     private void generateStyle() {
         int totalColumnCount = columnNames.length + TABLE_LEFT_OFFSET + TABLE_RIGHT_OFFSET;
-        for (int i = 0; i < MERGE_COMPANY_REGION_HEIGHT + MERGE_REPORT_REGION_HEIGHT + 2; i++) {
+        for (int i = 0; i < MERGE_COMPANY_REGION_HEIGHT + MERGE_REPORT_REGION_HEIGHT + data.size() + 2; i++) {
             Row row = sheet.createRow(i);
             for (int j = 0; j < DATA_Y_OFFSET + data.size() + 1; j++)
                 row.createCell(j);
