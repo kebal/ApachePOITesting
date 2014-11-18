@@ -106,8 +106,8 @@ public class XLSReportGenerator {
                 totalColumnCount - TABLE_RIGHT_OFFSET - 1
         );
 
-        RegionUtil.setBorderRight(CellStyle.BORDER_THIN, rightSeparator, sheet, workbook);
-        RegionUtil.setRightBorderColor(HSSFColor.AQUA.index, rightSeparator, sheet, workbook);
+        RegionUtil.setBorderBottom(CellStyle.BORDER_THIN, rightSeparator, sheet, workbook);
+        RegionUtil.setBottomBorderColor(HSSFColor.AQUA.index, rightSeparator, sheet, workbook);
 
         RegionUtil.setBorderBottom(CellStyle.BORDER_THIN, bottomSeparator, sheet, workbook);
         RegionUtil.setBottomBorderColor(HSSFColor.AQUA.index, bottomSeparator, sheet, workbook);
