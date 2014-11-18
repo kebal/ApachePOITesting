@@ -177,7 +177,7 @@ public class XLSReportGenerator {
             sheet.setColumnWidth(i, (int) width);
         }
 
-        //Set data style and fill table with data
+        //Set data style
         CellStyle dataStyle = workbook.createCellStyle();
         dataStyle.setAlignment(CellStyle.ALIGN_LEFT);
         dataStyle.setFillForegroundColor(HSSFColor.WHITE.index);
@@ -190,7 +190,12 @@ public class XLSReportGenerator {
         dataStyle.setBottomBorderColor(HSSFColor.GREY_25_PERCENT.index);
         dataStyle.setLeftBorderColor(HSSFColor.GREY_25_PERCENT.index);
         dataStyle.setRightBorderColor(HSSFColor.GREY_25_PERCENT.index);
-        setDataStyle(dataStyle);
+        //Set column names cell style
+        CellStyle columnNameCellStyle = workbook.createCellStyle();
+        columnNameCellStyle.setFillForegroundColor(HSSFColor.GREY_25_PERCENT.index);
+        columnNameCellStyle.setFillPattern(CellStyle.SOLID_FOREGROUND);
+        //Fill table with these styles
+        setDataStyle(dataStyle, columnNameCellStyle);
         fillData();
 
         //Check if fillData() method changed values so that company name doesn't fit it's cell width.
@@ -223,13 +228,15 @@ public class XLSReportGenerator {
         CellUtil.setCellStyleProperty(cell, workbook, "fillPattern", CellStyle.SOLID_FOREGROUND);
     }
 
-    private void setDataStyle(CellStyle style) {
-        int rowCount = DATA_Y_OFFSET;
+    private void setDataStyle(CellStyle dataStyle, CellStyle columnNameCellStyle) {
+        int rowCount = DATA_Y_OFFSET + 1;
         int columnsCount = DATA_X_OFFSET;
+        for (int i = 0; i < columnNames.length; i++)
+            sheet.getRow(rowCount - 1).getCell(columnsCount + i).setCellStyle(columnNameCellStyle);
         for (int i = 0; i < data.size() + 1; i++) {
             Row row = sheet.getRow(rowCount + i);
             for (int j = 0; j < columnNames.length; j++) {
-                row.getCell(columnsCount + j).setCellStyle(style);
+                row.getCell(columnsCount + j).setCellStyle(dataStyle);
             }
         }
     }
