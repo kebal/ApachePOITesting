@@ -158,7 +158,6 @@ public class XLSReportGenerator {
         reportNameCellFont.setColor(HSSFColor.AQUA.index);
         reportNameCellFont.setFontHeightInPoints((short) REPORT_NAME_FONT_SIZE);
         reportNameCellFont.setFontName("Segoe UI Semilight");
-        reportNameCellFont.setUnderline(HSSFFont.U_SINGLE);
 
         //Cell style for report name
         HSSFCellStyle reportNameCellStyle = workbook.createCellStyle();
