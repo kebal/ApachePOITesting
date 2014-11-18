@@ -192,7 +192,7 @@ public class XLSReportGenerator {
         dataStyle.setRightBorderColor(HSSFColor.GREY_25_PERCENT.index);
         //Set column names cell style
         CellStyle columnNameCellStyle = workbook.createCellStyle();
-        columnNameCellStyle.setFillForegroundColor(HSSFColor.GREY_25_PERCENT.index);
+        columnNameCellStyle.setFillForegroundColor(HSSFColor.AQUA.index);
         columnNameCellStyle.setFillPattern(CellStyle.SOLID_FOREGROUND);
         //Fill table with these styles
         setDataStyle(dataStyle, columnNameCellStyle);
@@ -233,7 +233,7 @@ public class XLSReportGenerator {
         int columnsCount = DATA_X_OFFSET;
         for (int i = 0; i < columnNames.length; i++)
             sheet.getRow(rowCount - 1).getCell(columnsCount + i).setCellStyle(columnNameCellStyle);
-        for (int i = 0; i < data.size() + 1; i++) {
+        for (int i = 0; i < data.size(); i++) {
             Row row = sheet.getRow(rowCount + i);
             for (int j = 0; j < columnNames.length; j++) {
                 row.getCell(columnsCount + j).setCellStyle(dataStyle);
