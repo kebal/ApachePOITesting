@@ -223,27 +223,48 @@ Max:
     private void fillData(){
         Row titleRow = sheet.getRow(DATA_Y_OFFSET);
         for(int i = DATA_X_OFFSET; i < columnNames.length + DATA_X_OFFSET;i++) {
-            titleRow.createCell(i).setCellValue(columnNames[i-DATA_X_OFFSET]);
+            titleRow.createCell(i).setCellValue(columnNames[i - DATA_X_OFFSET]);
             sheet.setColumnWidth(i, INTIAL_CELL_WIDTH + FILTER_WIDTH_OFFSET);
             sheet.setAutoFilter(new CellRangeAddress(titleRow.getRowNum(), titleRow.getRowNum(), 0, i));
         }
 
-        int rowOffset =  DATA_Y_OFFSET + 1;
-        for(int i = 0; i < data.size();i++){
-            Row dataRow = sheet.getRow(rowOffset);
-            dataRow.createCell(i).setCellValue("aaa");
-            rowOffset++;
-        }
+        int rowCount =  DATA_Y_OFFSET+1;
+        double first;
+        String second;
+        double third;
+        Object[] dataInfo;
+        int k =0;
+            for(int i = rowCount; i < rowCount + data.size();i++) {
+                for (int j = DATA_X_OFFSET; j < DATA_X_OFFSET + columnNames.length; j++) {
+                     Row dataRow = sheet.getRow(i);
+
+                    dataInfo = data.get(k);
+                    first = (Double) dataInfo[0];
+                    second = (String) dataInfo[1];
+                    third = (Double) dataInfo[2];
+
+                    switch (j- DATA_X_OFFSET ){
+                        case 0:
+                            dataRow.getCell(j).setCellValue(first);
+                            break;
+                        case 1:
+                            dataRow.getCell(j).setCellValue(second);
+                            break;
+
+                        case 2:
+                            dataRow.getCell(j).setCellValue(third);
+                            break;
+
+                    }
 
 
-
-
-
+                }
+                k++;
+            }
         sheet.setAutoFilter(new CellRangeAddress(titleRow.getRowNum(),titleRow.getRowNum(),DATA_X_OFFSET,columnNames.length ));
 
+        }
 
-
-    }
 
 
     public void createXlsFile() {
@@ -267,7 +288,7 @@ Max:
         data.add(new Object[]{3d, "Dean", 700000d});
         data.add(new Object[]{5d, "Max", 22222d});
 
-        XLSReportGenerator main = new XLSReportGenerator("VERY COOL PROVIDER", "CI Report",
+        XLSReportGenerator main = new XLSReportGenerator("VERY COOL PROVIDER", "SI Report",
                              new String[] { "Emp", "Emp", "Emp"}, data);
         main.createXlsFile();
 
