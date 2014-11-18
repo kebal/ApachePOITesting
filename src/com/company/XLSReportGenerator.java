@@ -130,19 +130,16 @@ public class XLSReportGenerator {
         companyNameCellFont.setColor(HSSFColor.WHITE.index);
         companyNameCellFont.setFontHeightInPoints((short) COMPANY_NAME_FONT_SIZE);
         companyNameCellFont.setFontName("Segoe UI Semilight");
-        //Cell style for company name
-        HSSFCellStyle companyNameCellStyle = workbook.createCellStyle();
-        companyNameCellStyle.setFillForegroundColor(HSSFColor.AQUA.index);
-        companyNameCellStyle.setFillPattern(CellStyle.SOLID_FOREGROUND);
-        companyNameCellStyle.setAlignment(HSSFCellStyle.ALIGN_CENTER);
-        companyNameCellStyle.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
-        companyNameCellStyle.setFont(companyNameCellFont);
 
         //Fill the merged region with company name
         Row row = sheet.getRow(0);
         row.setHeight((short) MERGE_COMPANY_ROW_HEIGHT);
         Cell cell = row.getCell(0);
-        cell.setCellStyle(companyNameCellStyle);
+        CellUtil.setCellStyleProperty(cell, workbook, "fillForegroundColor", HSSFColor.AQUA.index);
+        CellUtil.setCellStyleProperty(cell, workbook, "fillPattern", CellStyle.SOLID_FOREGROUND);
+        CellUtil.setCellStyleProperty(cell, workbook, "alignment", HSSFCellStyle.ALIGN_CENTER);
+        CellUtil.setCellStyleProperty(cell, workbook, "verticalAlignment", HSSFCellStyle.VERTICAL_CENTER);
+        cell.getCellStyle().setFont(companyNameCellFont);
         cell.setCellValue(companyName);
 
         {//Fill the one line between company name and report name merge regions.
@@ -163,19 +160,15 @@ public class XLSReportGenerator {
         reportNameCellFont.setFontHeightInPoints((short) REPORT_NAME_FONT_SIZE);
         reportNameCellFont.setFontName("Segoe UI Semilight");
 
-        //Cell style for report name
-        HSSFCellStyle reportNameCellStyle = workbook.createCellStyle();
-        reportNameCellStyle.setAlignment(HSSFCellStyle.ALIGN_LEFT);
-        reportNameCellStyle.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
-        reportNameCellStyle.setFillForegroundColor(HSSFColor.WHITE.index);
-        reportNameCellStyle.setFillPattern(CellStyle.SOLID_FOREGROUND);
-        reportNameCellStyle.setFont(reportNameCellFont);
-
         //Fill the merged region with report name
         row = sheet.getRow(2);
         row.setHeight((short)MERGE_REPORT_ROW_HEIGHT);
         cell = row.getCell(TABLE_LEFT_OFFSET);
-        cell.setCellStyle(reportNameCellStyle);
+        CellUtil.setCellStyleProperty(cell, workbook, "fillForegroundColor", HSSFColor.WHITE.index);
+        CellUtil.setCellStyleProperty(cell, workbook, "fillPattern", CellStyle.SOLID_FOREGROUND);
+        CellUtil.setCellStyleProperty(cell, workbook, "alignment", HSSFCellStyle.ALIGN_LEFT);
+        CellUtil.setCellStyleProperty(cell, workbook, "verticalAlignment", HSSFCellStyle.VERTICAL_CENTER);
+        cell.getCellStyle().setFont(reportNameCellFont);
         cell.setCellValue(reportName);
 
         double totalWidth = ((COMPANY_NAME_FONT_SIZE / 1.6) / (totalColumnCount)) * companyName.length() * 256;
@@ -225,11 +218,9 @@ public class XLSReportGenerator {
     }
 
     private void setPureBackGround(CellRangeAddress region, short color) {
-        HSSFCellStyle cellStyle = workbook.createCellStyle();
-        cellStyle.setFillForegroundColor(color);
-        cellStyle.setFillPattern(CellStyle.SOLID_FOREGROUND);
         Cell cell = sheet.getRow(region.getFirstRow()).getCell(region.getFirstColumn());
-        cell.setCellStyle(cellStyle);
+        CellUtil.setCellStyleProperty(cell, workbook, "fillForegroundColor", color);
+        CellUtil.setCellStyleProperty(cell, workbook, "fillPattern", CellStyle.SOLID_FOREGROUND);
     }
 
     private void setDataStyle(CellStyle style) {
