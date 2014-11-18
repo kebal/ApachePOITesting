@@ -240,11 +240,12 @@ Max:
         int rowCount = DATA_Y_OFFSET + 1;
         int columsCount = DATA_X_OFFSET;
 
-        for (int j = 0; j <  columnNames.length; j++) {
-            for (int i = 0; i < data.size(); i++) {
-                Row dataRow = sheet.getRow(rowCount + i);
-                Object[] dataInfo = data.get(i);
-                Object object = dataInfo[j];
+        for (int i = 0; i < data.size(); i++) {
+            Object[] dataInfo = data.get(i);
+            Row dataRow = sheet.getRow(rowCount + i);
+
+            for (int j = 0; j <  columnNames.length; j++) {
+                 Object object = dataInfo[j];
 
                 if (object instanceof Double) {
                     dataRow.getCell(columsCount +j).setCellValue((Double) object);
@@ -281,13 +282,13 @@ Max:
 
     public static void main(String[] args) {
         List<Object[]> data = new ArrayList<Object[]>();
-        data.add(new Object[]{1d, "John", 15000000000d});
-        data.add(new Object[]{2d, "Sam", 800000d});
-        data.add(new Object[]{3d, "Dean", 700000d});
-        data.add(new Object[]{5d, "Max", 22222d});
-
+        data.add(new Object[]{1d, "John", 15000000000d,"aa"});
+        data.add(new Object[]{2d, "Sam", 800000d,"bb"});
+        data.add(new Object[]{3d, "Dean", 700000d,"bb"});
+        data.add(new Object[]{5d, "Max", 22222d,"bb"});
+        data.add(new Object[]{6d, "blkasfax", 22222222d,"bb"});
         XLSReportGenerator main = new XLSReportGenerator("VERY COOL PROVIDER", "SI Report",
-                new String[]{"Emp", "Emp", "Emp"}, data);
+                new String[]{"Emp", "Emp", "Emp","Test"}, data);
         main.createXlsFile();
 
     }
