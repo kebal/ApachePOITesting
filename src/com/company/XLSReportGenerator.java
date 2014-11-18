@@ -23,6 +23,8 @@ public class XLSReportGenerator {
     public static final double COMPANY_NAME_FONT_SIZE = 20;
     public static final double REPORT_NAME_FONT_SIZE = 20;
     private static final int INTIAL_CELL_WIDTH = 3000;
+    private static final int FILTER_WIDTH_OFFSET = 500;
+
     //SPECIALLY FOR MAX
     public static final int DATA_X_OFFSET = 1;
     public static final int DATA_Y_OFFSET = MERGE_COMPANY_REGION_HEIGHT + MERGE_REPORT_REGION_HEIGHT + 1;
@@ -139,14 +141,7 @@ public class XLSReportGenerator {
         }
 
         //Fill data, just for testing
-        Row row = sheet.getRow(DATA_Y_OFFSET);
-        row.createCell(0);
-        row.createCell(1).setCellValue(columnNames[0]);
-        row.createCell(2).setCellValue(columnNames[1]);
-        row.createCell(3).setCellValue(columnNames[2]);
-        sheet.setColumnWidth(1, INTIAL_CELL_WIDTH);
-        sheet.setColumnWidth(2, INTIAL_CELL_WIDTH);
-        sheet.setColumnWidth(3,INTIAL_CELL_WIDTH);
+
 
         //Check if autoSizeColumn functions reduced the width of row (thus company name doesn't fit the cell)
         //and expand the very right and the very left cells
@@ -158,6 +153,8 @@ public class XLSReportGenerator {
             sheet.setColumnWidth(0, (int) (width + difference / 2));
             sheet.setColumnWidth(totalColumnCount - 1, (int) (width + difference / 2));
         }
+
+        fillData();
     }
 /*
 Lexa:
@@ -182,6 +179,32 @@ Max:
 // fillColumns(); - set data for every cell
 // writeWorkBook() - save xls
 */
+
+    private void fillData(){
+        Row titleRow = sheet.getRow(DATA_Y_OFFSET);
+        for(int i = DATA_X_OFFSET; i < columnNames.length + DATA_X_OFFSET;i++) {
+            titleRow.createCell(i).setCellValue(columnNames[i-DATA_X_OFFSET]);
+            sheet.setColumnWidth(i, INTIAL_CELL_WIDTH + FILTER_WIDTH_OFFSET);
+            sheet.setAutoFilter(new CellRangeAddress(titleRow.getRowNum(), titleRow.getRowNum(), 0, i));
+        }
+
+        int rowOffset =  DATA_Y_OFFSET + 1;
+        for(int i = 0; i < data.size();i++){
+            Row dataRow = sheet.getRow(rowOffset);
+            dataRow.createCell(i).setCellValue("aaa");
+            rowOffset++;
+        }
+
+
+
+
+
+        sheet.setAutoFilter(new CellRangeAddress(titleRow.getRowNum(),titleRow.getRowNum(),DATA_X_OFFSET,columnNames.length ));
+
+
+
+    }
+
 
     public void createXlsFile() {
         generateStyle();
