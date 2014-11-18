@@ -17,7 +17,6 @@ public class Main {
 
     private int startX;
     private int startY;
-    private int l;
 
 /*
 Lexa:
@@ -38,16 +37,16 @@ Max:
 
     public static void generateXLS(String[] columnNames, Map<Integer, Object[]> data) {
 
-        // generateWorkbook(); - cool company title
-        // generateStyle(); - generate style for every cell DO NOT FORGET BORDERS
-        // generateReportName(); - set report name - param report type
-        // fillColumns(); - set data for every cell
-        // writeWorkBook() - save xls
+    // generateWorkbook(); - cool company title
+    // generateStyle(); - generate style for every cell DO NOT FORGET BORDERS
+    // generateReportName(); - set report name - param report type
+    // fillColumns(); - set data for every cell
+    // writeWorkBook() - save xls
 
         final int COLUMN = 0;
         HSSFWorkbook workbook = new HSSFWorkbook();
         HSSFSheet sheet = workbook.createSheet("Report");
-        //   sheet.setAutoFilter(CellRangeAddress.valueOf("A1:C5"));
+     //   sheet.setAutoFilter(CellRangeAddress.valueOf("A1:C5"));
         sheet.addMergedRegion(new CellRangeAddress(
                 0,    //first row (0-based)
                 4, //last row  (0-based)
@@ -79,10 +78,10 @@ Max:
         for (int i = 0; i < 7; i++) {
             Cell cell = namesRow.createCell(i);
             if(i == 6)cell.setCellStyle(mainStyle);
-            // cell.setCellValue(columnNames[i]);
+           // cell.setCellValue(columnNames[i]);
         }
         sheet.autoSizeColumn(COLUMN);
-
+        
         //Style for cells with data
 //        HSSFCellStyle commonStyle = workbook.createCellStyle();
 //        commonStyle.setAlignment(CellStyle.ALIGN_LEFT);
@@ -117,7 +116,7 @@ Max:
 //            sheet.autoSizeColumn(rowNum++);
 //        }
         writeWorkBook(workbook);
-    }
+}
 
     public static void writeWorkBook(HSSFWorkbook workbook) {
         try {
