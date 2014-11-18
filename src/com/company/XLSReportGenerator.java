@@ -5,6 +5,7 @@ import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.ss.util.CellUtil;
 import org.apache.poi.ss.util.RegionUtil;
 
 import java.io.*;
@@ -18,7 +19,7 @@ public class XLSReportGenerator {
     public static final int MERGE_REPORT_ROW_HEIGHT = 750;
     public static final int TABLE_LEFT_OFFSET = 1;
     public static final int TABLE_RIGHT_OFFSET = 1;
-    public static final double COMPANY_NAME_FONT_SIZE = 20;
+    public static final double COMPANY_NAME_FONT_SIZE = 24;
     public static final double REPORT_NAME_FONT_SIZE = 20;
     private static final int INITIAL_CELL_WIDTH = 3000;
     private static final int INITIAL_LETTER_WIDTH = 250;
@@ -76,6 +77,7 @@ public class XLSReportGenerator {
                 0,                                                      //first column (0-based)
                 totalColumnCount - 1                                    //last column  (0-based)
         ));
+
         CellRangeAddress reportNameRegion = new CellRangeAddress(
                 2,                          //first row (0-based)
                 2, //last row  (0-based)
@@ -104,6 +106,12 @@ public class XLSReportGenerator {
                 totalColumnCount - TABLE_RIGHT_OFFSET - 1
         );
 
+        RegionUtil.setBorderRight(CellStyle.BORDER_THIN, rightSeparator, sheet, workbook);
+        RegionUtil.setRightBorderColor(HSSFColor.AQUA.index, rightSeparator, sheet, workbook);
+
+        RegionUtil.setBorderBottom(CellStyle.BORDER_THIN, bottomSeparator, sheet, workbook);
+        RegionUtil.setBottomBorderColor(HSSFColor.AQUA.index, bottomSeparator, sheet, workbook);
+
         setLeftRightBorders(reportNameRegion, CellStyle.BORDER_THIN, HSSFColor.WHITE.index);
         setPureBackGround(rightSeparator, HSSFColor.WHITE.index);
         setPureBackGround(leftSeparator, HSSFColor.WHITE.index);
@@ -117,8 +125,7 @@ public class XLSReportGenerator {
         Font companyNameCellFont = workbook.createFont();
         companyNameCellFont.setColor(HSSFColor.WHITE.index);
         companyNameCellFont.setFontHeightInPoints((short) COMPANY_NAME_FONT_SIZE);
-        companyNameCellFont.setFontName("Berlin Sans FB Demi");
-        companyNameCellFont.setItalic(true);
+        companyNameCellFont.setFontName("Segoe UI Semilight");
         //Cell style for company name
         HSSFCellStyle companyNameCellStyle = workbook.createCellStyle();
         companyNameCellStyle.setFillForegroundColor(HSSFColor.AQUA.index);
@@ -127,41 +134,12 @@ public class XLSReportGenerator {
         companyNameCellStyle.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
         companyNameCellStyle.setFont(companyNameCellFont);
 
-        //Fill the first merged region with company name
+        //Fill the merged region with company name
         Row row = sheet.getRow(0);
         row.setHeight((short) MERGE_COMPANY_ROW_HEIGHT);
         Cell cell = row.getCell(0);
         cell.setCellStyle(companyNameCellStyle);
         cell.setCellValue(companyName);
-
-        //Font for report name
-        Font reportNameCellFont = workbook.createFont();
-        reportNameCellFont.setColor(HSSFColor.AQUA.index);
-        reportNameCellFont.setFontHeightInPoints((short) REPORT_NAME_FONT_SIZE);
-        reportNameCellFont.setFontName("Times New Roman");
-        reportNameCellFont.setUnderline(HSSFFont.U_SINGLE);
-
-        //Cell style for report name
-        HSSFCellStyle reportNameCellStyle = workbook.createCellStyle();
-        reportNameCellStyle.setAlignment(HSSFCellStyle.ALIGN_LEFT);
-        reportNameCellStyle.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
-        reportNameCellStyle.setFillForegroundColor(HSSFColor.WHITE.index);
-        reportNameCellStyle.setFillPattern(CellStyle.SOLID_FOREGROUND);
-        reportNameCellStyle.setFont(reportNameCellFont);
-
-        //Fill the first merged region with report name
-        row = sheet.getRow(2);
-        row.setHeight((short)MERGE_REPORT_ROW_HEIGHT);
-        cell = row.getCell(TABLE_LEFT_OFFSET);
-        cell.setCellStyle(reportNameCellStyle);
-        cell.setCellValue(reportName);
-
-
-        double totalWidth = ((COMPANY_NAME_FONT_SIZE / 1.6) / (totalColumnCount)) * companyName.length() * 256;
-        double width = totalWidth / (totalColumnCount);
-        for (int i = 0; i < totalColumnCount; i++) {
-            sheet.setColumnWidth(i, (int) width);
-        }
 
         {//Fill the one line between company name and report name merge regions.
             HSSFCellStyle tempCellStyle = workbook.createCellStyle();
@@ -175,10 +153,51 @@ public class XLSReportGenerator {
                 tempRow.getCell(j).setCellStyle(tempCellStyle);
         }
 
+        //Font for report name
+        Font reportNameCellFont = workbook.createFont();
+        reportNameCellFont.setColor(HSSFColor.AQUA.index);
+        reportNameCellFont.setFontHeightInPoints((short) REPORT_NAME_FONT_SIZE);
+        reportNameCellFont.setFontName("Segoe UI Semilight");
+        reportNameCellFont.setUnderline(HSSFFont.U_SINGLE);
+
+        //Cell style for report name
+        HSSFCellStyle reportNameCellStyle = workbook.createCellStyle();
+        reportNameCellStyle.setAlignment(HSSFCellStyle.ALIGN_LEFT);
+        reportNameCellStyle.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
+        reportNameCellStyle.setFillForegroundColor(HSSFColor.WHITE.index);
+        reportNameCellStyle.setFillPattern(CellStyle.SOLID_FOREGROUND);
+        reportNameCellStyle.setFont(reportNameCellFont);
+
+        //Fill the merged region with report name
+        row = sheet.getRow(2);
+        row.setHeight((short)MERGE_REPORT_ROW_HEIGHT);
+        cell = row.getCell(TABLE_LEFT_OFFSET);
+        cell.setCellStyle(reportNameCellStyle);
+        cell.setCellValue(reportName);
+
+        double totalWidth = ((COMPANY_NAME_FONT_SIZE / 1.6) / (totalColumnCount)) * companyName.length() * 256;
+        double width = totalWidth / (totalColumnCount);
+        for (int i = 0; i < totalColumnCount; i++) {
+            sheet.setColumnWidth(i, (int) width);
+        }
+
+        //Set data style and fill table with data
+        CellStyle dataStyle = workbook.createCellStyle();
+        dataStyle.setAlignment(CellStyle.ALIGN_LEFT);
+        dataStyle.setFillForegroundColor(HSSFColor.WHITE.index);
+        dataStyle.setFillPattern(CellStyle.SOLID_FOREGROUND);
+        dataStyle.setBorderTop(CellStyle.BORDER_THIN);
+        dataStyle.setBorderBottom(CellStyle.BORDER_THIN);
+        dataStyle.setBorderLeft(CellStyle.BORDER_THIN);
+        dataStyle.setBorderRight(CellStyle.BORDER_THIN);
+        dataStyle.setTopBorderColor(HSSFColor.GREY_25_PERCENT.index);
+        dataStyle.setBottomBorderColor(HSSFColor.GREY_25_PERCENT.index);
+        dataStyle.setLeftBorderColor(HSSFColor.GREY_25_PERCENT.index);
+        dataStyle.setRightBorderColor(HSSFColor.GREY_25_PERCENT.index);
+        setDataStyle(dataStyle);
         fillData();
 
-        //Check if autoSizeColumn functions reduced the width of row (thus company name doesn't fit the cell)
-        //and expand the very right and the very left cells
+        //Check if fillData() method changed values so that company name doesn't fit it's cell width.
         int sum = 0;
         for (int i = 0; i < totalColumnCount; i++)
             sum += sheet.getColumnWidth(i);
@@ -210,7 +229,19 @@ public class XLSReportGenerator {
         cell.setCellStyle(cellStyle);
     }
 
+    private void setDataStyle(CellStyle style) {
+        int rowCount = DATA_Y_OFFSET;
+        int columnsCount = DATA_X_OFFSET;
+        for (int i = 0; i < data.size() + 1; i++) {
+            Row row = sheet.getRow(rowCount + i);
+            for (int j = 0; j < columnNames.length; j++) {
+                row.getCell(columnsCount + j).setCellStyle(style);
+            }
+        }
+    }
+
     private void fillData() {
+        //Array to save column width, to fit all inserted data.
         int [] widths = new int[columnNames.length];
         Row titleRow = sheet.getRow(DATA_Y_OFFSET);
         for (int i = DATA_X_OFFSET; i < columnNames.length + DATA_X_OFFSET; i++) {
@@ -268,8 +299,8 @@ public class XLSReportGenerator {
         data.add(new Object[]{3d, "Dean", "700000d"});
         data.add(new Object[]{5d, "Max", "22222d"});
 
-        XLSReportGenerator main = new XLSReportGenerator("VERY VERY VERY COOL PROVIDER", "SI Report",
-                new String[]{"Emp", "Emp", "Emp"}, data);
+        XLSReportGenerator main = new XLSReportGenerator("VERY COOL PROVIDER", "SI Report",
+                new String[]{"Empasfasfasf", "Emp", "Emp"}, data);
         main.createXlsFile();
 
     }
