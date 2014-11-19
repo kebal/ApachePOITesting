@@ -13,21 +13,27 @@ import java.util.*;
 
 
 public class XLSReportGenerator {
-    private static final int MERGE_COMPANY_ROW_HEIGHT = 1250;
-    private static final int MERGE_REPORT_ROW_HEIGHT = 800;
-    private static final int TABLE_LEFT_OFFSET = 1;
-    private static final int TABLE_RIGHT_OFFSET = 1;
-    private static final double COMPANY_NAME_FONT_SIZE = 24;
-    private static final double REPORT_NAME_FONT_SIZE = 20;
+
+
+    public static final int MERGE_COMPANY_ROW_HEIGHT = 1250;
+    public static final int MERGE_REPORT_ROW_HEIGHT = 800;
+    public static final int TABLE_LEFT_OFFSET = 1;
+    public static final int TABLE_RIGHT_OFFSET = 1;
+    public static final double COMPANY_NAME_FONT_SIZE = 24;
+    public static final double REPORT_NAME_FONT_SIZE = 20;
     private static final int INITIAL_CELL_WIDTH = 3000;
     private static final int INITIAL_LETTER_WIDTH = 250;
     private static final int FILTER_WIDTH_OFFSET = 1250;
 
     //SPECIALLY FOR MAX
 
-    /** Value - {@value}, column position to start filling data with .*/
+    /**
+     * Value - {@value}, column position to start filling data with .
+     */
     public static final int DATA_X_OFFSET = 1;
-    /** Value - {@value}, row position to start filling data with .*/
+    /**
+     * Value - {@value}, row position to start filling data with .
+     */
     public static final int DATA_Y_OFFSET = 3;
 
     private String companyName;
@@ -160,7 +166,7 @@ public class XLSReportGenerator {
 
         //Fill the merged region with report name
         row = sheet.getRow(2);
-        row.setHeight((short)MERGE_REPORT_ROW_HEIGHT);
+        row.setHeight((short) MERGE_REPORT_ROW_HEIGHT);
         cell = row.getCell(TABLE_LEFT_OFFSET);
         CellUtil.setCellStyleProperty(cell, workbook, "fillForegroundColor", HSSFColor.WHITE.index);
         CellUtil.setCellStyleProperty(cell, workbook, "fillPattern", CellStyle.SOLID_FOREGROUND);
@@ -239,15 +245,32 @@ public class XLSReportGenerator {
         }
     }
 
+    private double countWidthCoef(int index) {
+        double res = INITIAL_CELL_WIDTH / INITIAL_LETTER_WIDTH;
+        if(columnNames[index - DATA_X_OFFSET]==null)
+            return 1;
+        double coef = (double) (INITIAL_CELL_WIDTH / INITIAL_LETTER_WIDTH) / columnNames[index - DATA_X_OFFSET].length();
+        if (coef > 4)
+            res = (res / 3.9);
+        else if (coef > 2)
+            res = (res / 1.9);
+        else if (coef < 1)
+            res = columnNames[index - DATA_X_OFFSET].length();
+
+        return res;
+
+    }
+
     private void fillData() {
         //Array to save column width, to fit all inserted data.
-        int [] widths = new int[columnNames.length];
+        double[] widths = new double[columnNames.length];
         Row titleRow = sheet.getRow(DATA_Y_OFFSET);
         for (int i = DATA_X_OFFSET; i < columnNames.length + DATA_X_OFFSET; i++) {
             titleRow.getCell(i).setCellValue(columnNames[i - DATA_X_OFFSET]);
-            widths[i - DATA_X_OFFSET] = Math.max(columnNames[i - DATA_X_OFFSET].length(),INITIAL_CELL_WIDTH / INITIAL_LETTER_WIDTH);
+            widths[i - DATA_X_OFFSET] = countWidthCoef(i);
+            //Math.max(columnNames[i - DATA_X_OFFSET].length(), INITIAL_CELL_WIDTH / INITIAL_LETTER_WIDTH);
         }
-        sheet.setAutoFilter(new CellRangeAddress(titleRow.getRowNum(),titleRow.getRowNum(),DATA_X_OFFSET,columnNames.length));
+        sheet.setAutoFilter(new CellRangeAddress(titleRow.getRowNum(), titleRow.getRowNum(), DATA_X_OFFSET, columnNames.length));
 
         int rowCount = DATA_Y_OFFSET + 1;
         int columnsCount = DATA_X_OFFSET;
@@ -267,13 +290,14 @@ public class XLSReportGenerator {
                 } else if (object instanceof Boolean) {
                     cell.setCellValue((Date) object);
                 }
-                widths[j] = Math.max(widths[j], object.toString().length());
+                if(object != null)
+                widths[j] = Math.max(widths[j], (double) object.toString().length());
                 j++;
             }
         }
 
         for (int i = 1; i <= widths.length; i++) {
-            sheet.setColumnWidth(i, widths[i - 1] * INITIAL_LETTER_WIDTH + FILTER_WIDTH_OFFSET);
+            sheet.setColumnWidth(i, (int) (widths[i - 1] * INITIAL_LETTER_WIDTH + FILTER_WIDTH_OFFSET));
         }
     }
 
@@ -294,12 +318,12 @@ public class XLSReportGenerator {
     public static void main(String[] args) {
         List<Object[]> data = new ArrayList<Object[]>();
         data.add(new Object[]{1d, "Johnsdgdsgdsgsdg", "150d"});
-        data.add(new Object[]{2d, "Samsdgsdgdsg", "800000d"});
-        data.add(new Object[]{3d, "Deansdgsdgsdg", "700000d"});
-        data.add(new Object[]{5d, "Maxsdgsdgsdgsdgsdgds", "22222ddsgdsgdsgdsgsdhfdhfdhdfhdfhfdhdfhfdhdfhdhfdhdfhdfhdgsdgsdg"});
+        data.add(new Object[]{null, "Samsdgsdgdsg", "800000d"});
+        data.add(new Object[]{null, "Deansdgsdgsdg", "700000d"});
+        data.add(new Object[]{null,null ,"22222ddsgdsgdsgdsgsdgsdgsdg"});
 
         XLSReportGenerator main = new XLSReportGenerator("VERY COOL PROVIDER", "SI Report",
-                new String[]{"E", "Emp", "Emp"}, data);
+                new String[]{null, "Emphhhhhhhhhhhhhhhhhhhhhhhhhhh", "Emp","ONE MORE"}, data);
         main.createXlsFile();
 
     }
