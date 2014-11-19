@@ -22,17 +22,14 @@ public class XLSReportGenerator {
     private static final int INITIAL_CELL_WIDTH = 3000;
     private static final int INITIAL_LETTER_WIDTH = 250;
     private static final int FILTER_WIDTH_OFFSET = 1250;
-
-    //SPECIALLY FOR MAX
-
     /**
      * Value - {@value}, column position to start filling data with .
      */
-    public static final int DATA_X_OFFSET = 1;
+    private static final int DATA_X_OFFSET = 1;
     /**
      * Value - {@value}, row position to start filling data with .
      */
-    public static final int DATA_Y_OFFSET = 3;
+    private static final int DATA_Y_OFFSET = 3;
 
     private String companyName;
     private String reportName;
