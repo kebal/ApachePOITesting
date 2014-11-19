@@ -13,14 +13,12 @@ import java.util.*;
 
 
 public class XLSReportGenerator {
-
-
-    public static final int MERGE_COMPANY_ROW_HEIGHT = 1250;
-    public static final int MERGE_REPORT_ROW_HEIGHT = 800;
-    public static final int TABLE_LEFT_OFFSET = 1;
-    public static final int TABLE_RIGHT_OFFSET = 1;
-    public static final double COMPANY_NAME_FONT_SIZE = 24;
-    public static final double REPORT_NAME_FONT_SIZE = 20;
+    private static final int MERGE_COMPANY_ROW_HEIGHT = 1250;
+    private static final int MERGE_REPORT_ROW_HEIGHT = 800;
+    private static final int TABLE_LEFT_OFFSET = 1;
+    private static final int TABLE_RIGHT_OFFSET = 1;
+    private static final double COMPANY_NAME_FONT_SIZE = 24;
+    private static final double REPORT_NAME_FONT_SIZE = 20;
     private static final int INITIAL_CELL_WIDTH = 3000;
     private static final int INITIAL_LETTER_WIDTH = 250;
     private static final int FILTER_WIDTH_OFFSET = 1250;
@@ -298,7 +296,7 @@ public class XLSReportGenerator {
         data.add(new Object[]{1d, "Johnsdgdsgdsgsdg", "150d"});
         data.add(new Object[]{2d, "Samsdgsdgdsg", "800000d"});
         data.add(new Object[]{3d, "Deansdgsdgsdg", "700000d"});
-        data.add(new Object[]{5d, "Maxsdgsdgsdgsdgsdgds", "22222ddsgdsgdsgdsgsdgsdgsdg"});
+        data.add(new Object[]{5d, "Maxsdgsdgsdgsdgsdgds", "22222ddsgdsgdsgdsgsdhfdhfdhdfhdfhfdhdfhfdhdfhdhfdhdfhdfhdgsdgsdg"});
 
         XLSReportGenerator main = new XLSReportGenerator("VERY COOL PROVIDER", "SI Report",
                 new String[]{"E", "Emp", "Emp"}, data);
