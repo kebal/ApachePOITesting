@@ -54,9 +54,13 @@ public class XLSReportGenerator {
         this.data = data;
         workbook = new HSSFWorkbook();
         sheet = workbook.createSheet("Report");
+        generateDocument();
     }
 
-    private void generateStyle() {
+    /**
+     * Generates look up of a document and fills it with data.
+     */
+    private void generateDocument() {
         int totalColumnCount = columnNames.length + TABLE_LEFT_OFFSET + TABLE_RIGHT_OFFSET;
         for (int i = 0; i < DATA_Y_OFFSET + data.size() + 2; i++) {
             Row row = sheet.createRow(i);
@@ -296,10 +300,9 @@ public class XLSReportGenerator {
         }
     }
 
-    public void createXlsFile() {
-        generateStyle();
+    public void createXlsFile(String fileName) {
         try {
-            File file = new File("report.xls");
+            File file = new File(fileName);
             FileOutputStream out = new FileOutputStream(file);
             workbook.write(out);
             out.close();
@@ -319,7 +322,7 @@ public class XLSReportGenerator {
 
         XLSReportGenerator main = new XLSReportGenerator("VERY COOL PROVIDER", "SI Report",
                 new String[]{null, "Emphhhhhhhhhhhhhhhhhhhhhhhhhhh", "Emp","ONE MORE"}, data);
-        main.createXlsFile();
+        main.createXlsFile("report.xls");
 
     }
 }
