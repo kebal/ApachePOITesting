@@ -4,17 +4,16 @@ package com.company;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.CellUtil;
 import org.apache.poi.ss.util.RegionUtil;
 
 import java.io.*;
+import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Types;
-import java.util.*;
 
 
 public class XLSReportGenerator  {
@@ -40,7 +39,7 @@ public class XLSReportGenerator  {
     /**
      * Value - {@value}, column position to start filling data with .
      */
-    private static final int DATA_X_OFFSET = 1;
+    private static final int DATA_X_OFFSET = TABLE_LEFT_OFFSET;
     /**
      * Value - {@value}, row position to start filling data with .
      */
@@ -73,15 +72,17 @@ public class XLSReportGenerator  {
      * Generates look up of a document and fills it with data.
      */
     private void generateDocument() throws SQLException{
+        //Calculates initial width for every column
         int totalColumnCount = metaData.getColumnCount() + TABLE_LEFT_OFFSET + TABLE_RIGHT_OFFSET;
         double totalWidth = ((COMPANY_NAME_FONT_SIZE / 1.6) / (totalColumnCount)) * PROVIDER_NAME.length() * 256;
         double width = totalWidth / (totalColumnCount);
         for (int i = 0; i < totalColumnCount; i++) {
             sheet.setColumnWidth(i, (int) width);
         }
+
+        //Fills data and returns how many rows were inserted
         int rowsInserted = fillData();
 
-        int mergeWidth = metaData.getColumnCount();
         sheet.addMergedRegion(new CellRangeAddress(
                 0,                                                      //first row (0-based)
                 0,                        //last row  (0-based)
@@ -104,21 +105,21 @@ public class XLSReportGenerator  {
 
         CellRangeAddress leftSeparator = new CellRangeAddress(
                 DATA_Y_OFFSET - 1,
-                DATA_Y_OFFSET + rowsInserted + 1,
+                DATA_Y_OFFSET + rowsInserted,
                 0,
                 0
         );
 
         CellRangeAddress rightSeparator = new CellRangeAddress(
                 DATA_Y_OFFSET - 1,
-                DATA_Y_OFFSET + rowsInserted + 1,
+                DATA_Y_OFFSET + rowsInserted,
                 totalColumnCount - 1,
                 totalColumnCount - 1
         );
 
         CellRangeAddress bottomSeparator = new CellRangeAddress(
-                DATA_Y_OFFSET + rowsInserted + 1,
-                DATA_Y_OFFSET + rowsInserted + 1,
+                DATA_Y_OFFSET + rowsInserted,
+                DATA_Y_OFFSET + rowsInserted,
                 TABLE_LEFT_OFFSET,
                 totalColumnCount - TABLE_RIGHT_OFFSET - 1
         );
@@ -263,17 +264,21 @@ public class XLSReportGenerator  {
         }
     }
 
+    /**
+     *
+     * @param index Index of metaData column label
+     * @return
+     * @throws SQLException
+     */
     private double countWidthCoef(int index) throws SQLException {
         double res = INITIAL_CELL_WIDTH / INITIAL_LETTER_WIDTH;
-//        if(metaData.getColumnLabel[index - DATA_X_OFFSET]==null)
-//            return 1;
-        double coef = (double) (INITIAL_CELL_WIDTH / INITIAL_LETTER_WIDTH) / metaData.getColumnLabel(index + 1).length();
+        double coef = (double) (INITIAL_CELL_WIDTH / INITIAL_LETTER_WIDTH) / metaData.getColumnLabel(index).length();
         if (coef > 4)
             res = (res / 3.9);
         else if (coef > 2)
             res = (res / 1.9);
         else if (coef < 1)
-            res = metaData.getColumnLabel(index + 1).length();
+            res = metaData.getColumnLabel(index).length();
         return res;
 
     }
@@ -284,46 +289,60 @@ public class XLSReportGenerator  {
      * @throws SQLException
      */
     private int fillData() throws SQLException {
-
-
         int rowsInserted = 1;//1 for column names row
         //Array to save column width, to fit all inserted data.
         double[] widths = new double[metaData.getColumnCount()];
-        int columnsCount = DATA_X_OFFSET - 1;
-        int rowCount = DATA_Y_OFFSET + 1;
+        int currentRowNumber = DATA_Y_OFFSET + 1;//+1 for column names row
         Row titleRow = CellUtil.getRow(DATA_Y_OFFSET, sheet);
 
         for (int i = 0; i < metaData.getColumnCount(); i++) {
-            CellUtil.getCell(titleRow, i + columnsCount).setCellValue(metaData.getColumnLabel(i + 1));
-            widths[i] = countWidthCoef(i);
-            //Math.max(columnNames[i ].length(), INITIAL_CELL_WIDTH / INITIAL_LETTER_WIDTH);
+            String s = metaData.getColumnLabel(i + 1);
+            CellUtil.getCell(titleRow, i + DATA_X_OFFSET).setCellValue(s.charAt(0) + s.substring(1).toLowerCase());
+            widths[i] = countWidthCoef(i + 1);
         }
         sheet.setAutoFilter(new CellRangeAddress(titleRow.getRowNum(), titleRow.getRowNum(), DATA_X_OFFSET, metaData.getColumnCount()));
 
         while (resultSet.next()) {
-            Row dataRow = CellUtil.getRow(rowCount, sheet);
-            rowCount++;
+            Row dataRow = CellUtil.getRow(currentRowNumber, sheet);
             for (int j = 0; j < metaData.getColumnCount(); j++) {
-                Cell cell = CellUtil.getCell(dataRow, columnsCount + j);
+                Cell cell = CellUtil.getCell(dataRow, DATA_X_OFFSET + j);
                 XMLType type = getTypeID(metaData.getColumnType(j + 1));
                 switch (type) {
                     case Text:
-                        cell.setCellValue(resultSet.getString(j + 1));
+                        String s = resultSet.getString(j + 1);
+                        if (s != null)
+                            widths[j] = Math.max(widths[j], s.length());
+                        cell.setCellValue(s);
                         break;
                     case Number:
-                        cell.setCellValue(resultSet.getDouble(j + 1));
+                        Double d = resultSet.getDouble(j + 1);
+                        if (d != null)
+                            widths[j] = Math.max(widths[j], d.toString().length());
+                        cell.setCellValue(d);
                         break;
                     case Date:
+                        Date date = resultSet.getDate(j + 1);
+                        if (date != null)
+                            widths[j] = Math.max(widths[j], date.toString().length());
                         cell.setCellValue(resultSet.getDate(j + 1));
                         break;
                     case Bool:
-                        cell.setCellValue(resultSet.getBoolean(j + 1));
+                        Boolean b = resultSet.getBoolean(j + 1);
+                        if (b != null)
+                            widths[j] = Math.max(widths[j], b.toString().length());
+                        cell.setCellValue(b);
                         break;
                     case ToString:
-                        cell.setCellValue(resultSet.getObject(j + 1).toString());
+                        Object o = resultSet.getObject(j + 1).toString();
+                        if (o != null) {
+                            widths[j] = Math.max(widths[j], o.toString().length());
+                            cell.setCellValue(o.toString());
+                        }
                         break;
                 }
             }
+
+            currentRowNumber++;
             rowsInserted++;
         }
         for (int i = 1; i <= widths.length; i++) {
