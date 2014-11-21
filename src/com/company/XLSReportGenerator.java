@@ -48,8 +48,8 @@ public class XLSReportGenerator  {
      * Constructor.
      *
 
-    * @param reportName  name of the report
-   //  * @param columnNames array of columns names
+     * @param reportName  name of the report
+    //  * @param columnNames array of columns names
     // * @param data        list of objects array to fill columns
      */
     public XLSReportGenerator(String reportName,ResultSet resultSet) throws SQLException{
@@ -266,27 +266,33 @@ public class XLSReportGenerator  {
 
     }
 
-    private void fillData() throws SQLException {
+    /**
+     *
+     * @return How many rows were inserted
+     * @throws SQLException
+     */
+    private int fillData() throws SQLException {
+        int rowsInserted = 1;//1 for column names row
         //Array to save column width, to fit all inserted data.
         double[] widths = new double[metaData.getColumnCount()];
         int columnsCount = DATA_X_OFFSET;
         int rowCount = DATA_Y_OFFSET + 1;
-        Row titleRow = sheet.getRow(DATA_Y_OFFSET);
+        Row titleRow = CellUtil.getRow(DATA_Y_OFFSET, sheet);
 
         for (int i = 0; i < metaData.getColumnCount(); i++) {
-            titleRow.getCell(i+columnsCount).setCellValue(metaData.getColumnLabel(i));
+            CellUtil.getCell(titleRow, i + columnsCount).setCellValue(metaData.getColumnLabel(i));
             widths[i - DATA_X_OFFSET] = countWidthCoef(i);
             //Math.max(columnNames[i - DATA_X_OFFSET].length(), INITIAL_CELL_WIDTH / INITIAL_LETTER_WIDTH);
         }
         sheet.setAutoFilter(new CellRangeAddress(titleRow.getRowNum(), titleRow.getRowNum(), DATA_X_OFFSET,metaData.getColumnCount()));
 
         for (resultSet.first();resultSet.last();resultSet.next()) {
-            Row dataRow = sheet.getRow(rowCount);
+            Row dataRow = CellUtil.getRow(rowCount, sheet);
             rowCount++;
             for(int j = 0; j < metaData.getColumnCount(); j++) {
-                Cell cell = dataRow.getCell(columnsCount+j);
+                Cell cell = CellUtil.getCell(dataRow, columnsCount+j);
 
-              //  Class cl = Class.forName(metaData.getColumnClassName(j));
+                //  Class cl = Class.forName(metaData.getColumnClassName(j));
                 //int type = getTypeID(metaData.getColumnType(j));
                 Object object = resultSet.getObject(j);
                 //resultSet.ge
@@ -299,13 +305,14 @@ public class XLSReportGenerator  {
                 } else if (object instanceof Boolean) {
                     cell.setCellValue((Date) object);
                 }
-
             }
+            rowsInserted++;
 
         }
         for (int i = 1; i <= widths.length; i++) {
             sheet.setColumnWidth(i, (int) (widths[i - 1] * INITIAL_LETTER_WIDTH + FILTER_WIDTH_OFFSET));
         }
+        return rowsInserted;
     }
 
 
@@ -317,10 +324,10 @@ public class XLSReportGenerator  {
             case Types.REAL:
             case Types.NUMERIC:
                 return 1;
-                break;
+            break;
 //            case Types
 //
-    }
+        }
 
     }
 
@@ -339,7 +346,7 @@ public class XLSReportGenerator  {
 
     public static void main(String[] args) {
 
-       // XLSReportGenerator main = new XLSReportGenerator("COMPANY_NAME_FONT_SIZE",res);
+        // XLSReportGenerator main = new XLSReportGenerator("COMPANY_NAME_FONT_SIZE",res);
         //main.createXlsFile("report.xls");
 
     }
