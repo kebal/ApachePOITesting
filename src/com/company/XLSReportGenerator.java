@@ -267,13 +267,13 @@ public class XLSReportGenerator  {
         double res = INITIAL_CELL_WIDTH / INITIAL_LETTER_WIDTH;
 //        if(metaData.getColumnLabel[index - DATA_X_OFFSET]==null)
 //            return 1;
-        double coef = (double) (INITIAL_CELL_WIDTH / INITIAL_LETTER_WIDTH) / metaData.getColumnLabel(index - DATA_X_OFFSET).length();
+        double coef = (double) (INITIAL_CELL_WIDTH / INITIAL_LETTER_WIDTH) / metaData.getColumnLabel(index + 1).length();
         if (coef > 4)
             res = (res / 3.9);
         else if (coef > 2)
             res = (res / 1.9);
         else if (coef < 1)
-            res = metaData.getColumnLabel(index - DATA_X_OFFSET).length();
+            res = metaData.getColumnLabel(index + 1).length();
         return res;
 
     }
