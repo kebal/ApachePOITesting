@@ -17,7 +17,7 @@ import java.sql.Types;
 import java.util.*;
 
 
-public class XLSReportGenerator {
+public class XLSReportGenerator  {
     private static final int MERGE_COMPANY_ROW_HEIGHT = 1250;
     private static final int MERGE_REPORT_ROW_HEIGHT = 800;
     private static final int TABLE_LEFT_OFFSET = 1;
@@ -37,7 +37,6 @@ public class XLSReportGenerator {
         ToString
     }
 
-
     /**
      * Value - {@value}, column position to start filling data with .
      */
@@ -56,10 +55,12 @@ public class XLSReportGenerator {
     /**
      * Constructor.
      *
-     * @param reportName name of the report
-     * @param resultSet  ResultSet of data for filling the report
+
+     * @param reportName  name of the report
+    //  * @param columnNames array of columns names
+    // * @param data        list of objects array to fill columns
      */
-    public XLSReportGenerator(String reportName, ResultSet resultSet) throws SQLException {
+    public XLSReportGenerator(String reportName,ResultSet resultSet) throws SQLException{
         this.resultSet = resultSet;
         metaData = resultSet.getMetaData();
         this.reportName = reportName;
@@ -70,8 +71,6 @@ public class XLSReportGenerator {
 
     /**
      * Generates look up of a document and fills it with data.
-     *
-     * @throws java.sql.SQLException
      */
     private void generateDocument() throws SQLException{
         int totalColumnCount = metaData.getColumnCount() + TABLE_LEFT_OFFSET + TABLE_RIGHT_OFFSET;
@@ -268,18 +267,19 @@ public class XLSReportGenerator {
         double res = INITIAL_CELL_WIDTH / INITIAL_LETTER_WIDTH;
 //        if(metaData.getColumnLabel[index - DATA_X_OFFSET]==null)
 //            return 1;
-        double coef = (double) (INITIAL_CELL_WIDTH / INITIAL_LETTER_WIDTH) / metaData.getColumnLabel(index + 1).length();
+        double coef = (double) (INITIAL_CELL_WIDTH / INITIAL_LETTER_WIDTH) / metaData.getColumnLabel(index - DATA_X_OFFSET).length();
         if (coef > 4)
             res = (res / 3.9);
         else if (coef > 2)
             res = (res / 1.9);
         else if (coef < 1)
-            res = metaData.getColumnLabel(index + 1).length();
+            res = metaData.getColumnLabel(index - DATA_X_OFFSET).length();
         return res;
 
     }
 
     /**
+     *
      * @return How many rows were inserted
      * @throws SQLException
      */
