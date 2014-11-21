@@ -324,6 +324,23 @@ public class XLSReportGenerator  {
                         cell.setCellValue(object.toString());
                         break;
                 }
+                switch (type) {
+                    case Text:
+                        cell.setCellValue(resultSet.getString(j + 1));
+                        break;
+                    case Number:
+                        cell.setCellValue(resultSet.getDouble(j + 1));
+                        break;
+                    case Date:
+                        cell.setCellValue(resultSet.getDate(j + 1));
+                        break;
+                    case Bool:
+                        cell.setCellValue(resultSet.getBoolean(j + 1));
+                        break;
+                    case ToString:
+                        cell.setCellValue(resultSet.getObject(j + 1).toString());
+                        break;
+                }
             }
             rowsInserted++;
         }
