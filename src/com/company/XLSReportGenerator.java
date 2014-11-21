@@ -65,14 +65,14 @@ public class XLSReportGenerator  {
      * Generates look up of a document and fills it with data.
      */
     private void generateDocument() throws SQLException{
-
-        int rowCount = 5;
         int totalColumnCount = metaData.getColumnCount() + TABLE_LEFT_OFFSET + TABLE_RIGHT_OFFSET;
-        for (int i = 0; i < DATA_Y_OFFSET + rowCount + 2; i++) {
-            Row row = sheet.createRow(i);
-            for (int j = 0; j < totalColumnCount; j++)
-                row.createCell(j);
+        double totalWidth = ((COMPANY_NAME_FONT_SIZE / 1.6) / (totalColumnCount)) * PROVIDER_NAME.length() * 256;
+        double width = totalWidth / (totalColumnCount);
+        for (int i = 0; i < totalColumnCount; i++) {
+            sheet.setColumnWidth(i, (int) width);
         }
+        int rowsInserted = fillData();
+
         int mergeWidth = metaData.getColumnCount();
         sheet.addMergedRegion(new CellRangeAddress(
                 0,                                                      //first row (0-based)
@@ -96,21 +96,21 @@ public class XLSReportGenerator  {
 
         CellRangeAddress leftSeparator = new CellRangeAddress(
                 DATA_Y_OFFSET - 1,
-                DATA_Y_OFFSET + rowCount + 1,
+                DATA_Y_OFFSET + rowsInserted + 1,
                 0,
                 0
         );
 
         CellRangeAddress rightSeparator = new CellRangeAddress(
                 DATA_Y_OFFSET - 1,
-                DATA_Y_OFFSET + rowCount + 1,
+                DATA_Y_OFFSET + rowsInserted + 1,
                 totalColumnCount - 1,
                 totalColumnCount - 1
         );
 
         CellRangeAddress bottomSeparator = new CellRangeAddress(
-                DATA_Y_OFFSET + rowCount + 1,
-                DATA_Y_OFFSET + rowCount + 1,
+                DATA_Y_OFFSET + rowsInserted + 1,
+                DATA_Y_OFFSET + rowsInserted + 1,
                 TABLE_LEFT_OFFSET,
                 totalColumnCount - TABLE_RIGHT_OFFSET - 1
         );
@@ -141,9 +141,9 @@ public class XLSReportGenerator  {
         companyNameCellFont.setFontName("Segoe UI Semilight");
 
         //Fill the merged region with company name
-        Row row = sheet.getRow(0);
+        Row row = CellUtil.getRow(0, sheet);
         row.setHeight((short) MERGE_COMPANY_ROW_HEIGHT);
-        Cell cell = row.getCell(0);
+        Cell cell = CellUtil.getCell(row, 0);
         CellUtil.setCellStyleProperty(cell, workbook, "fillForegroundColor", HSSFColor.AQUA.index);
         CellUtil.setCellStyleProperty(cell, workbook, "fillPattern", CellStyle.SOLID_FOREGROUND);
         CellUtil.setCellStyleProperty(cell, workbook, "alignment", HSSFCellStyle.ALIGN_CENTER);
@@ -157,10 +157,10 @@ public class XLSReportGenerator  {
             tempCellStyle.setTopBorderColor(HSSFColor.WHITE.index);
             tempCellStyle.setFillForegroundColor(HSSFColor.AQUA.index);
             tempCellStyle.setFillPattern(CellStyle.SOLID_FOREGROUND);
-            Row tempRow = sheet.getRow(1);
+            Row tempRow = CellUtil.getRow(1, sheet);
             tempRow.setHeight((short) 150);
             for (int j = 0; j < totalColumnCount; j++)
-                tempRow.getCell(j).setCellStyle(tempCellStyle);
+                CellUtil.getCell(tempRow, j).setCellStyle(tempCellStyle);
         }
 
         //Font for report name
@@ -170,9 +170,9 @@ public class XLSReportGenerator  {
         reportNameCellFont.setFontName("Segoe UI Semilight");
 
         //Fill the merged region with report name
-        row = sheet.getRow(2);
+        row = CellUtil.getRow(2, sheet);
         row.setHeight((short) MERGE_REPORT_ROW_HEIGHT);
-        cell = row.getCell(TABLE_LEFT_OFFSET);
+        cell = CellUtil.getCell(row, TABLE_LEFT_OFFSET);
         CellUtil.setCellStyleProperty(cell, workbook, "fillForegroundColor", HSSFColor.WHITE.index);
         CellUtil.setCellStyleProperty(cell, workbook, "fillPattern", CellStyle.SOLID_FOREGROUND);
         CellUtil.setCellStyleProperty(cell, workbook, "alignment", HSSFCellStyle.ALIGN_LEFT);
@@ -180,11 +180,7 @@ public class XLSReportGenerator  {
         cell.getCellStyle().setFont(reportNameCellFont);
         cell.setCellValue(reportName);
 
-        double totalWidth = ((COMPANY_NAME_FONT_SIZE / 1.6) / (totalColumnCount)) * PROVIDER_NAME.length() * 256;
-        double width = totalWidth / (totalColumnCount);
-        for (int i = 0; i < totalColumnCount; i++) {
-            sheet.setColumnWidth(i, (int) width);
-        }
+
 
         //Set data style
         CellStyle dataStyle = workbook.createCellStyle();
@@ -204,8 +200,7 @@ public class XLSReportGenerator  {
         columnNameCellStyle.setFillForegroundColor(HSSFColor.AQUA.index);
         columnNameCellStyle.setFillPattern(CellStyle.SOLID_FOREGROUND);
         //Fill table with these styles
-        setDataStyle(dataStyle, columnNameCellStyle);
-        fillData();
+        setDataStyle(dataStyle, columnNameCellStyle, rowsInserted);
 
         //Check if fillData() method changed values so that company name doesn't fit it's cell width.
         int sum = 0;
@@ -221,7 +216,6 @@ public class XLSReportGenerator  {
             sheet.setColumnWidth(totalColumnCount - 1, Math.max(2000, (int) (width - difference)));
         }
 
-
     }
 
     private void setLeftRightBorders(CellRangeAddress region, short border, short color) {
@@ -232,20 +226,31 @@ public class XLSReportGenerator  {
     }
 
     private void setPureBackGround(CellRangeAddress region, short color) {
-        Cell cell = sheet.getRow(region.getFirstRow()).getCell(region.getFirstColumn());
+        Row row = CellUtil.getRow(region.getFirstRow(), sheet);
+        Cell cell = CellUtil.getCell(row, region.getFirstColumn());
         CellUtil.setCellStyleProperty(cell, workbook, "fillForegroundColor", color);
         CellUtil.setCellStyleProperty(cell, workbook, "fillPattern", CellStyle.SOLID_FOREGROUND);
     }
 
-    private void setDataStyle(CellStyle dataStyle, CellStyle columnNameCellStyle) throws SQLException {
+    /**
+     *
+     * @param dataStyle
+     * @param columnNameCellStyle
+     * @param rowsInserted How many rows inserted fillData method
+     * @throws SQLException
+     */
+    private void setDataStyle(CellStyle dataStyle, CellStyle columnNameCellStyle, int rowsInserted) throws SQLException {
         int rowCount = DATA_Y_OFFSET + 1;
         int columnsCount = DATA_X_OFFSET;
-        for (int i = 0; i < metaData.getColumnCount(); i++)
-            sheet.getRow(rowCount - 1).getCell(columnsCount + i).setCellStyle(columnNameCellStyle);
-        for (int i = 0; i < data.size(); i++) {
-            Row row = sheet.getRow(rowCount + i);
+        for (int i = 0; i < metaData.getColumnCount(); i++) {
+            Row row = CellUtil.getRow(rowCount - 1, sheet);
+            Cell cell = CellUtil.getCell(row, columnsCount + i);
+            cell.setCellStyle(columnNameCellStyle);
+        }
+        for (int i = 0; i < rowsInserted - 1; i++) {//minus one because we don't take into consederation column names row
+            Row row = CellUtil.getRow(rowCount + i, sheet);
             for (int j = 0; j < metaData.getColumnCount(); j++) {
-                row.getCell(columnsCount + j).setCellStyle(dataStyle);
+                CellUtil.getCell(row, columnsCount + j).setCellStyle(dataStyle);
             }
         }
     }
@@ -261,7 +266,6 @@ public class XLSReportGenerator  {
             res = (res / 1.9);
         else if (coef < 1)
             res = metaData.getColumnLabel(index - DATA_X_OFFSET).length();
-
         return res;
 
     }
