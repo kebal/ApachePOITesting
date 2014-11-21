@@ -267,23 +267,36 @@ public class XLSReportGenerator  {
     private void fillData() throws SQLException {
         //Array to save column width, to fit all inserted data.
         double[] widths = new double[metaData.getColumnCount()];
+        int columnsCount = DATA_X_OFFSET;
+        int rowCount = DATA_Y_OFFSET + 1;
         Row titleRow = sheet.getRow(DATA_Y_OFFSET);
-        for (int i = DATA_X_OFFSET; i < metaData.getColumnCount() + DATA_X_OFFSET; i++) {
-            titleRow.getCell(i).setCellValue(metaData.getColumnLabel(i - DATA_X_OFFSET));
+
+        for (int i = 0; i < metaData.getColumnCount(); i++) {
+            titleRow.getCell(i+columnsCount).setCellValue(metaData.getColumnLabel(i));
             widths[i - DATA_X_OFFSET] = countWidthCoef(i);
             //Math.max(columnNames[i - DATA_X_OFFSET].length(), INITIAL_CELL_WIDTH / INITIAL_LETTER_WIDTH);
         }
         sheet.setAutoFilter(new CellRangeAddress(titleRow.getRowNum(), titleRow.getRowNum(), DATA_X_OFFSET,metaData.getColumnCount()));
 
-        int rowCount = DATA_Y_OFFSET + 1;
-        int columnsCount = DATA_X_OFFSET;
-
         for (resultSet.first();resultSet.last();resultSet.next()) {
+            Row dataRow = sheet.getRow(rowCount);
+            rowCount++;
+            for(int j = 0; j < metaData.getColumnCount(); j++) {
+                Cell cell = dataRow.getCell(columnsCount+j);
+                Object object =resultSet.getObject(j);
+                if (object instanceof Double) {
+                    cell.setCellValue((Double) object);
+                } else if (object instanceof String) {
+                    cell.setCellValue((String) object);
+                } else if (object instanceof Date) {
+                    cell.setCellValue((Date) object);
+                } else if (object instanceof Boolean) {
+                    cell.setCellValue((Date) object);
+                }
 
-
+            }
 
         }
-
         for (int i = 1; i <= widths.length; i++) {
             sheet.setColumnWidth(i, (int) (widths[i - 1] * INITIAL_LETTER_WIDTH + FILTER_WIDTH_OFFSET));
         }
@@ -303,22 +316,9 @@ public class XLSReportGenerator  {
     }
 
     public static void main(String[] args) {
-        List<Object[]> data = new ArrayList<Object[]>();
-        data.add(new Object[]{1d, "Johnsdgdsgdsgsdg", "150d"});
-        data.add(new Object[]{null, "Samsdgsdgdsg", "800000d"});
-        data.add(new Object[]{null, "Deansdgsdgsdg", "700000d"});
-        data.add(new Object[]{null,null ,"22222ddsgdsgdsgdsgsdgsdgsdg"});
 
-      //  Statement stmt = con.createStatement(
-//                ResultSet.TYPE_SCROLL_INSENSITIVE,
-//                ResultSet.CONCUR_UPDATABLE);
-//        ResultSet rs = stmt.executeQuery("SELECT a, b FROM TABLE2");
-
-
-
-        XLSReportGenerator main = new XLSReportGenerator("VERY COOL PROVIDER", "SI Report",
-                new String[]{null, "Emphhhhhhhhhhhhhhhhhhhhhhhhhhh", "Emp","ONE MORE"}, data);
-        main.createXlsFile("report.xls");
+       // XLSReportGenerator main = new XLSReportGenerator("COMPANY_NAME_FONT_SIZE",res);
+        //main.createXlsFile("report.xls");
 
     }
 }
