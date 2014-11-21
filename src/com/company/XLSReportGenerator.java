@@ -9,10 +9,13 @@ import org.apache.poi.ss.util.CellUtil;
 import org.apache.poi.ss.util.RegionUtil;
 
 import java.io.*;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.util.*;
 
 
-public class XLSReportGenerator {
+public class XLSReportGenerator  {
     private static final int MERGE_COMPANY_ROW_HEIGHT = 1250;
     private static final int MERGE_REPORT_ROW_HEIGHT = 800;
     private static final int TABLE_LEFT_OFFSET = 1;
@@ -22,6 +25,8 @@ public class XLSReportGenerator {
     private static final int INITIAL_CELL_WIDTH = 3000;
     private static final int INITIAL_LETTER_WIDTH = 250;
     private static final int FILTER_WIDTH_OFFSET = 1250;
+    private static final String PROVIDER_NAME = "Cauliflower";
+
     /**
      * Value - {@value}, column position to start filling data with .
      */
@@ -31,27 +36,24 @@ public class XLSReportGenerator {
      */
     private static final int DATA_Y_OFFSET = 3;
 
-    private String companyName;
     private String reportName;
-    private String[] columnNames;
-    private List<Object[]> data;
-
+    private ResultSet resultSet;
+    private ResultSetMetaData metaData;
     private HSSFWorkbook workbook;
     private HSSFSheet sheet;
 
     /**
      * Constructor.
      *
-     * @param companyName name of the company created report
-     * @param reportName  name of the report
-     * @param columnNames array of columns names
-     * @param data        list of objects array to fill columns
+
+    * @param reportName  name of the report
+   //  * @param columnNames array of columns names
+    // * @param data        list of objects array to fill columns
      */
-    public XLSReportGenerator(String companyName, String reportName, String[] columnNames, List<Object[]> data) {
-        this.companyName = companyName;
+    public XLSReportGenerator(String reportName,ResultSet resultSet) throws SQLException{
+        this.resultSet = resultSet;
+        metaData = resultSet.getMetaData();
         this.reportName = reportName;
-        this.columnNames = columnNames;
-        this.data = data;
         workbook = new HSSFWorkbook();
         sheet = workbook.createSheet("Report");
         generateDocument();
@@ -60,8 +62,10 @@ public class XLSReportGenerator {
     /**
      * Generates look up of a document and fills it with data.
      */
-    private void generateDocument() {
-        int totalColumnCount = columnNames.length + TABLE_LEFT_OFFSET + TABLE_RIGHT_OFFSET;
+    private void generateDocument() throws SQLException{
+
+        resultSet.getRow();
+        int totalColumnCount = metaData.getColumnCount() + TABLE_LEFT_OFFSET + TABLE_RIGHT_OFFSET;
         for (int i = 0; i < DATA_Y_OFFSET + data.size() + 2; i++) {
             Row row = sheet.createRow(i);
             for (int j = 0; j < totalColumnCount; j++)
@@ -319,6 +323,13 @@ public class XLSReportGenerator {
         data.add(new Object[]{null, "Samsdgsdgdsg", "800000d"});
         data.add(new Object[]{null, "Deansdgsdgsdg", "700000d"});
         data.add(new Object[]{null,null ,"22222ddsgdsgdsgdsgsdgsdgsdg"});
+
+      //  Statement stmt = con.createStatement(
+//                ResultSet.TYPE_SCROLL_INSENSITIVE,
+//                ResultSet.CONCUR_UPDATABLE);
+//        ResultSet rs = stmt.executeQuery("SELECT a, b FROM TABLE2");
+
+
 
         XLSReportGenerator main = new XLSReportGenerator("VERY COOL PROVIDER", "SI Report",
                 new String[]{null, "Emphhhhhhhhhhhhhhhhhhhhhhhhhhh", "Emp","ONE MORE"}, data);
