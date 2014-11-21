@@ -305,7 +305,7 @@ public class XLSReportGenerator  {
             rowCount++;
             for (int j = 0; j < metaData.getColumnCount(); j++) {
                 Cell cell = CellUtil.getCell(dataRow, columnsCount + j);
-                XMLType type = getTypeID(metaData.getColumnType(j));
+                XMLType type = getTypeID(metaData.getColumnType(j + 1));
                 Object object = resultSet.getObject(j);
                 switch (type) {
                     case Text:
