@@ -64,14 +64,14 @@ public class XLSReportGenerator  {
      */
     private void generateDocument() throws SQLException{
 
-        resultSet.getRow();
+        int rowCount = 5;
         int totalColumnCount = metaData.getColumnCount() + TABLE_LEFT_OFFSET + TABLE_RIGHT_OFFSET;
-        for (int i = 0; i < DATA_Y_OFFSET + data.size() + 2; i++) {
+        for (int i = 0; i < DATA_Y_OFFSET + rowCount + 2; i++) {
             Row row = sheet.createRow(i);
             for (int j = 0; j < totalColumnCount; j++)
                 row.createCell(j);
         }
-        int mergeWidth = columnNames.length;
+        int mergeWidth = metaData.getColumnCount();
         sheet.addMergedRegion(new CellRangeAddress(
                 0,                                                      //first row (0-based)
                 0,                        //last row  (0-based)
@@ -94,21 +94,21 @@ public class XLSReportGenerator  {
 
         CellRangeAddress leftSeparator = new CellRangeAddress(
                 DATA_Y_OFFSET - 1,
-                DATA_Y_OFFSET + data.size() + 1,
+                DATA_Y_OFFSET + rowCount + 1,
                 0,
                 0
         );
 
         CellRangeAddress rightSeparator = new CellRangeAddress(
                 DATA_Y_OFFSET - 1,
-                DATA_Y_OFFSET + data.size() + 1,
+                DATA_Y_OFFSET + rowCount + 1,
                 totalColumnCount - 1,
                 totalColumnCount - 1
         );
 
         CellRangeAddress bottomSeparator = new CellRangeAddress(
-                DATA_Y_OFFSET + data.size() + 1,
-                DATA_Y_OFFSET + data.size() + 1,
+                DATA_Y_OFFSET + rowCount + 1,
+                DATA_Y_OFFSET + rowCount + 1,
                 TABLE_LEFT_OFFSET,
                 totalColumnCount - TABLE_RIGHT_OFFSET - 1
         );
@@ -147,7 +147,7 @@ public class XLSReportGenerator  {
         CellUtil.setCellStyleProperty(cell, workbook, "alignment", HSSFCellStyle.ALIGN_CENTER);
         CellUtil.setCellStyleProperty(cell, workbook, "verticalAlignment", HSSFCellStyle.VERTICAL_CENTER);
         cell.getCellStyle().setFont(companyNameCellFont);
-        cell.setCellValue(companyName);
+        cell.setCellValue(PROVIDER_NAME);
 
         {//Fill the one line between company name and report name merge regions.
             HSSFCellStyle tempCellStyle = workbook.createCellStyle();
@@ -178,7 +178,7 @@ public class XLSReportGenerator  {
         cell.getCellStyle().setFont(reportNameCellFont);
         cell.setCellValue(reportName);
 
-        double totalWidth = ((COMPANY_NAME_FONT_SIZE / 1.6) / (totalColumnCount)) * companyName.length() * 256;
+        double totalWidth = ((COMPANY_NAME_FONT_SIZE / 1.6) / (totalColumnCount)) * PROVIDER_NAME.length() * 256;
         double width = totalWidth / (totalColumnCount);
         for (int i = 0; i < totalColumnCount; i++) {
             sheet.setColumnWidth(i, (int) width);
@@ -235,68 +235,53 @@ public class XLSReportGenerator  {
         CellUtil.setCellStyleProperty(cell, workbook, "fillPattern", CellStyle.SOLID_FOREGROUND);
     }
 
-    private void setDataStyle(CellStyle dataStyle, CellStyle columnNameCellStyle) {
+    private void setDataStyle(CellStyle dataStyle, CellStyle columnNameCellStyle) throws SQLException {
         int rowCount = DATA_Y_OFFSET + 1;
         int columnsCount = DATA_X_OFFSET;
-        for (int i = 0; i < columnNames.length; i++)
+        for (int i = 0; i < metaData.getColumnCount(); i++)
             sheet.getRow(rowCount - 1).getCell(columnsCount + i).setCellStyle(columnNameCellStyle);
         for (int i = 0; i < data.size(); i++) {
             Row row = sheet.getRow(rowCount + i);
-            for (int j = 0; j < columnNames.length; j++) {
+            for (int j = 0; j < metaData.getColumnCount(); j++) {
                 row.getCell(columnsCount + j).setCellStyle(dataStyle);
             }
         }
     }
 
-    private double countWidthCoef(int index) {
+    private double countWidthCoef(int index) throws SQLException {
         double res = INITIAL_CELL_WIDTH / INITIAL_LETTER_WIDTH;
-        if(columnNames[index - DATA_X_OFFSET]==null)
-            return 1;
-        double coef = (double) (INITIAL_CELL_WIDTH / INITIAL_LETTER_WIDTH) / columnNames[index - DATA_X_OFFSET].length();
+//        if(metaData.getColumnLabel[index - DATA_X_OFFSET]==null)
+//            return 1;
+        double coef = (double) (INITIAL_CELL_WIDTH / INITIAL_LETTER_WIDTH) / metaData.getColumnLabel(index - DATA_X_OFFSET).length();
         if (coef > 4)
             res = (res / 3.9);
         else if (coef > 2)
             res = (res / 1.9);
         else if (coef < 1)
-            res = columnNames[index - DATA_X_OFFSET].length();
+            res = metaData.getColumnLabel(index - DATA_X_OFFSET).length();
 
         return res;
 
     }
 
-    private void fillData() {
+    private void fillData() throws SQLException {
         //Array to save column width, to fit all inserted data.
-        double[] widths = new double[columnNames.length];
+        double[] widths = new double[metaData.getColumnCount()];
         Row titleRow = sheet.getRow(DATA_Y_OFFSET);
-        for (int i = DATA_X_OFFSET; i < columnNames.length + DATA_X_OFFSET; i++) {
-            titleRow.getCell(i).setCellValue(columnNames[i - DATA_X_OFFSET]);
+        for (int i = DATA_X_OFFSET; i < metaData.getColumnCount() + DATA_X_OFFSET; i++) {
+            titleRow.getCell(i).setCellValue(metaData.getColumnLabel(i - DATA_X_OFFSET));
             widths[i - DATA_X_OFFSET] = countWidthCoef(i);
             //Math.max(columnNames[i - DATA_X_OFFSET].length(), INITIAL_CELL_WIDTH / INITIAL_LETTER_WIDTH);
         }
-        sheet.setAutoFilter(new CellRangeAddress(titleRow.getRowNum(), titleRow.getRowNum(), DATA_X_OFFSET, columnNames.length));
+        sheet.setAutoFilter(new CellRangeAddress(titleRow.getRowNum(), titleRow.getRowNum(), DATA_X_OFFSET,metaData.getColumnCount()));
 
         int rowCount = DATA_Y_OFFSET + 1;
         int columnsCount = DATA_X_OFFSET;
 
-        for (int i = 0; i < data.size(); i++) {
-            Object[] dataInfo = data.get(i);
-            Row dataRow = sheet.getRow(rowCount + i);
-            int j = 0;
-            for (Object object : dataInfo) {
-                Cell cell = dataRow.getCell(columnsCount + j);
-                if (object instanceof Double) {
-                    cell.setCellValue((Double) object);
-                } else if (object instanceof String) {
-                    cell.setCellValue((String) object);
-                } else if (object instanceof Date) {
-                    cell.setCellValue((Date) object);
-                } else if (object instanceof Boolean) {
-                    cell.setCellValue((Date) object);
-                }
-                if(object != null)
-                widths[j] = Math.max(widths[j], (double) object.toString().length());
-                j++;
-            }
+        for (resultSet.first();resultSet.last();resultSet.next()) {
+
+
+
         }
 
         for (int i = 1; i <= widths.length; i++) {
