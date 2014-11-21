@@ -3,6 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="81e138c3-b9a2-45ce-b83a-b580dc54f154" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/company/XLSReportGenerator.java" afterPath="$PROJECT_DIR$/src/com/company/XLSReportGenerator.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="ApachePOITesting.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -31,8 +32,8 @@
       <file leaf-file-name="XLSReportGenerator.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/com/company/XLSReportGenerator.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.68390805" vertical-offset="5816" max-vertical-offset="7260">
-              <caret line="286" column="47" selection-start-line="286" selection-start-column="47" selection-end-line="286" selection-end-column="47" />
+            <state vertical-scroll-proportion="0.49425286" vertical-offset="6696" max-vertical-offset="7744">
+              <caret line="320" column="8" selection-start-line="320" selection-start-column="8" selection-end-line="320" selection-end-column="8" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -427,7 +428,8 @@
       <workItem from="1416412346469" duration="649000" />
       <workItem from="1416419924036" duration="1168000" />
       <workItem from="1416515456211" duration="2046000" />
-      <workItem from="1416575336562" duration="3782000" />
+      <workItem from="1416575336562" duration="7538000" />
+      <workItem from="1416597458647" duration="65000" />
     </task>
     <task id="LOCAL-00001" summary="Added some operations">
       <created>1416257998140</created>
@@ -445,7 +447,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="48659000" />
+    <option name="totallyTimeSpent" value="52480000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-9" y="-9" width="1938" height="1050" extended-state="6" />
@@ -510,6 +512,16 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/src/com/company/XLSReportGenerator.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="7700">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/com/company/XLSReportGenerator.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="7568">
@@ -664,8 +676,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/company/XLSReportGenerator.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.68390805" vertical-offset="5816" max-vertical-offset="7260">
-          <caret line="286" column="47" selection-start-line="286" selection-start-column="47" selection-end-line="286" selection-end-column="47" />
+        <state vertical-scroll-proportion="0.49425286" vertical-offset="6696" max-vertical-offset="7744">
+          <caret line="320" column="8" selection-start-line="320" selection-start-column="8" selection-end-line="320" selection-end-column="8" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>

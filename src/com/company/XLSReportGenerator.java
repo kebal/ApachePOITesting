@@ -1,5 +1,6 @@
 package com.company;
 
+
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.*;
@@ -12,6 +13,7 @@ import java.io.*;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.*;
 
 
@@ -283,9 +285,13 @@ public class XLSReportGenerator  {
             rowCount++;
             for(int j = 0; j < metaData.getColumnCount(); j++) {
                 Cell cell = dataRow.getCell(columnsCount+j);
-                Object object =resultSet.getObject(j);
+
+              //  Class cl = Class.forName(metaData.getColumnClassName(j));
+                //int type = getTypeID(metaData.getColumnType(j));
+                Object object = resultSet.getObject(j);
+                //resultSet.ge
                 if (object instanceof Double) {
-                    cell.setCellValue((Double) object);
+                    cell.setCellValue((Long) object);
                 } else if (object instanceof String) {
                     cell.setCellValue((String) object);
                 } else if (object instanceof Date) {
@@ -300,6 +306,22 @@ public class XLSReportGenerator  {
         for (int i = 1; i <= widths.length; i++) {
             sheet.setColumnWidth(i, (int) (widths[i - 1] * INITIAL_LETTER_WIDTH + FILTER_WIDTH_OFFSET));
         }
+    }
+
+
+    private int getTypeID(int typeCode){
+        switch (typeCode){
+            case Types.DOUBLE:
+            case Types.FLOAT:
+            case Types.INTEGER:
+            case Types.REAL:
+            case Types.NUMERIC:
+                return 1;
+                break;
+//            case Types
+//
+    }
+
     }
 
     public void createXlsFile(String fileName) {
