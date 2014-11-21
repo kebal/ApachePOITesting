@@ -289,12 +289,12 @@ public class XLSReportGenerator {
         int rowsInserted = 1;//1 for column names row
         //Array to save column width, to fit all inserted data.
         double[] widths = new double[metaData.getColumnCount()];
-        int columnsCount = DATA_X_OFFSET - 1;
+        int columnsCount = DATA_X_OFFSET ;
         int rowCount = DATA_Y_OFFSET + 1;
         Row titleRow = CellUtil.getRow(DATA_Y_OFFSET, sheet);
 
-        for (int i = 1; i < metaData.getColumnCount(); i++) {
-            CellUtil.getCell(titleRow, i + columnsCount).setCellValue(metaData.getColumnLabel(i));
+        for (int i = 0; i < metaData.getColumnCount(); i++) {
+            CellUtil.getCell(titleRow, i + columnsCount).setCellValue(metaData.getColumnLabel(i+1));
             widths[i - DATA_X_OFFSET] = countWidthCoef(i);
             //Math.max(columnNames[i - DATA_X_OFFSET].length(), INITIAL_CELL_WIDTH / INITIAL_LETTER_WIDTH);
         }
@@ -303,9 +303,9 @@ public class XLSReportGenerator {
         for (resultSet.first(); resultSet.last(); resultSet.next()) {
             Row dataRow = CellUtil.getRow(rowCount, sheet);
             rowCount++;
-            for (int j = 1; j < metaData.getColumnCount(); j++) {
+            for (int j = 0; j < metaData.getColumnCount(); j++) {
                 Cell cell = CellUtil.getCell(dataRow, columnsCount + j);
-                XMLType type = getTypeID(metaData.getColumnType(j));
+                XMLType type = getTypeID(metaData.getColumnType(j+1));
                 Object object = resultSet.getObject(j);
                 switch (type) {
                     case Text:
