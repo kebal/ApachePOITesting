@@ -303,7 +303,7 @@ public class XLSReportGenerator  {
         while (resultSet.next()) {
             Row dataRow = CellUtil.getRow(rowCount, sheet);
             rowCount++;
-            for (int j = 1; j < metaData.getColumnCount(); j++) {
+            for (int j = 0; j < metaData.getColumnCount(); j++) {
                 Cell cell = CellUtil.getCell(dataRow, columnsCount + j);
                 XMLType type = getTypeID(metaData.getColumnType(j));
                 Object object = resultSet.getObject(j);
