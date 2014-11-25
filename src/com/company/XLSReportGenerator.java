@@ -16,16 +16,37 @@ import java.sql.SQLException;
 import java.sql.Types;
 
 
-public class XLSReportGenerator  {
+/**
+ * @author Nikitin Alex
+ * @author Hladchuk Maxim
+ * @version 1.0 .
+ */
+public class XLSReportGenerator {
+
+
     private static final int MERGE_COMPANY_ROW_HEIGHT = 1250;
+
     private static final int MERGE_REPORT_ROW_HEIGHT = 800;
+
     private static final int TABLE_LEFT_OFFSET = 1;
+
     private static final int TABLE_RIGHT_OFFSET = 1;
+
     private static final double COMPANY_NAME_FONT_SIZE = 24;
+
     private static final double REPORT_NAME_FONT_SIZE = 20;
+
     private static final int INITIAL_CELL_WIDTH = 3000;
+
     private static final int INITIAL_LETTER_WIDTH = 250;
+    /**
+     * Value = {@value}, row position to start filling data with .
+     */
     private static final int FILTER_WIDTH_OFFSET = 1250;
+
+    /**
+     * Value = {@value}, row position to start filling data with .
+     */
     private static final String PROVIDER_NAME = "Cauliflower";
 
     private enum XMLType {
@@ -37,11 +58,12 @@ public class XLSReportGenerator  {
     }
 
     /**
-     * Value - {@value}, column position to start filling data with .
+     * Value = {@value}, column position to start filling data with .
      */
     private static final int DATA_X_OFFSET = TABLE_LEFT_OFFSET;
+
     /**
-     * Value - {@value}, row position to start filling data with .
+     * Value = {@value}, row position to start filling data with .
      */
     private static final int DATA_Y_OFFSET = 3;
 
@@ -54,12 +76,11 @@ public class XLSReportGenerator  {
     /**
      * Constructor.
      *
-
-     * @param reportName  name of the report
-    //  * @param columnNames array of columns names
-    // * @param data        list of objects array to fill columns
+     * @param reportName name of the report
+     * @param resultSet  ResultSet of data to fill the report
+     * @see java.sql.ResultSet
      */
-    public XLSReportGenerator(String reportName,ResultSet resultSet) throws SQLException{
+    public XLSReportGenerator(String reportName, ResultSet resultSet) throws SQLException {
         this.resultSet = resultSet;
         metaData = resultSet.getMetaData();
         this.reportName = reportName;
@@ -71,7 +92,7 @@ public class XLSReportGenerator  {
     /**
      * Generates look up of a document and fills it with data.
      */
-    private void generateDocument() throws SQLException{
+    private void generateDocument() throws SQLException {
         //Calculates initial width for every column
         int totalColumnCount = metaData.getColumnCount() + TABLE_LEFT_OFFSET + TABLE_RIGHT_OFFSET;
         double totalWidth = ((COMPANY_NAME_FONT_SIZE / 1.6) / (totalColumnCount)) * PROVIDER_NAME.length() * 256;
@@ -190,7 +211,6 @@ public class XLSReportGenerator  {
         cell.setCellValue(reportName);
 
 
-
         //Set data style
         CellStyle dataStyle = workbook.createCellStyle();
         dataStyle.setAlignment(CellStyle.ALIGN_LEFT);
@@ -227,6 +247,14 @@ public class XLSReportGenerator  {
 
     }
 
+
+    /**
+     * Set borders on left and right side for selected region
+     *
+     * @param region region to create borders
+     * @param border type of border
+     * @param color  color of the border
+     */
     private void setLeftRightBorders(CellRangeAddress region, short border, short color) {
         RegionUtil.setBorderLeft(border, region, sheet, workbook);
         RegionUtil.setBorderRight(border, region, sheet, workbook);
@@ -234,6 +262,12 @@ public class XLSReportGenerator  {
         RegionUtil.setRightBorderColor(color, region, sheet, workbook);
     }
 
+    /**
+     * Fills backfround with one color
+     *
+     * @param region region of cells to be filled with color
+     * @param color  color to fill with
+     */
     private void setPureBackGround(CellRangeAddress region, short color) {
         Row row = CellUtil.getRow(region.getFirstRow(), sheet);
         Cell cell = CellUtil.getCell(row, region.getFirstColumn());
@@ -242,10 +276,11 @@ public class XLSReportGenerator  {
     }
 
     /**
+     * Set style for data cells
      *
-     * @param dataStyle
-     * @param columnNameCellStyle
-     * @param rowsInserted How many rows inserted fillData method
+     * @param dataStyle           style of cell
+     * @param columnNameCellStyle style of column header cell
+     * @param rowsInserted        How many rows inserted fillData method
      * @throws SQLException
      */
     private void setDataStyle(CellStyle dataStyle, CellStyle columnNameCellStyle, int rowsInserted) throws SQLException {
@@ -265,9 +300,10 @@ public class XLSReportGenerator  {
     }
 
     /**
+     * Counts  coefficient to make the column width fit the text width
      *
      * @param index Index of metaData column label
-     * @return
+     * @return counted coefficient
      * @throws SQLException
      */
     private double countWidthCoef(int index) throws SQLException {
@@ -284,6 +320,7 @@ public class XLSReportGenerator  {
     }
 
     /**
+     * Fills column names and cells with data
      *
      * @return How many rows were inserted
      * @throws SQLException
@@ -353,8 +390,11 @@ public class XLSReportGenerator  {
 
 
     /**
+     * Finds xls-supported type for sql types
+     * to convert data from ResultSet
+     *
      * @param typeCode sql type id
-     * @return
+     * @return xls-supported type
      */
     private XMLType getTypeID(int typeCode) {
         switch (typeCode) {
@@ -378,6 +418,11 @@ public class XLSReportGenerator  {
 
     }
 
+
+    /**
+     * Generates xls report
+     * @param fileName name of generated xls-file
+     */
     public void createXlsFile(String fileName) {
         try {
             File file = new File(fileName);
